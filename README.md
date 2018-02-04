@@ -1,2 +1,3 @@
 # ChistyA
-chistiy
+chisti
+
