@@ -15,7 +15,7 @@ public class Calculate {
 	*	@return Echo plus your name
 	*/
 	
-	public static String echo(String name){
+	public String echo(String name){
 		return "Echo, echo, echo:" + name;
 	}
 	
