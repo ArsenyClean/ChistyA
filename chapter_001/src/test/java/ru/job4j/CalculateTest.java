@@ -22,11 +22,11 @@ public class CalculateTest {
 	 * @Test
 	 */
 	@Test
-	public void whenTakeNameThenTreeEchoPlusName () {
+	public void whenTakeNameThenTreeEchoPlusName() {
 		String input = "Chisty Arseny";
 		String expect = "Echo, echo, echo:Chisty Arseny";
 		Calculate calc = new Calculate();
-		String result = calc.Echo(input);
+		String result = calc.echo(input);
 		assertThat(result, is(expect));
 	}
 }
