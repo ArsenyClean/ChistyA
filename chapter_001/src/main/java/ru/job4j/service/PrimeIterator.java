@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
  * @since 16.02.2018
  */
 
-public class EvenNumbersIterator implements Iterator {
+public class PrimeIterator implements Iterator {
 
     public static void main(String[] args){
 
@@ -18,7 +18,7 @@ public class EvenNumbersIterator implements Iterator {
     private int [] Array;
     public int indexI = 0;
 
-    public EvenNumbersIterator(final int[] Array) {
+    public PrimeIterator(final int[] Array) {
         this.Array = Array;
     }
 
@@ -26,10 +26,16 @@ public class EvenNumbersIterator implements Iterator {
     public boolean hasNext()  {
             int copyIndexI = indexI;
             while (Array.length > copyIndexI) {
-                if (Array[copyIndexI] % 2 == 0)
+                boolean flagIsFind = true;
+                for ( int i = Array[indexI] - 1; i > 1; i-- ){
+                    if ( Array[indexI] % i == 0 ){
+                        flagIsFind = false;
+                        break;
+                    }
+                }
+                if (flagIsFind)
                     return true;
-                else
-                    copyIndexI++;
+                copyIndexI++;
             }
         return false;
     }
@@ -37,12 +43,25 @@ public class EvenNumbersIterator implements Iterator {
     @Override
     public Object next() throws NoSuchElementException {
         try {
+            if ( Array[indexI] == 1)
+                indexI++;
+            if (Array[indexI] == 2) {
+                indexI++;
+                return Array[indexI - 1];
+            }
             while (Array.length > indexI) {
-                if (Array[indexI] % 2 == 0) {
+                boolean flagIsFind = true;
+                for ( int i = 2; i < Array[indexI]; i++ ){
+                    if ( Array[indexI] % i == 0 ){
+                        flagIsFind = false;
+                        break;
+                    }
+                }
+                if (flagIsFind) {
                     indexI++;
                     return Array[indexI - 1];
-                } else
-                    indexI++;
+                }
+                indexI++;
                 if (Array.length <= indexI)
                     throw new NoSuchElementException();
             }
