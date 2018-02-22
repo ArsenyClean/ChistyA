@@ -20,6 +20,18 @@ public class Node <E> implements SimpleContainer, Iterator {
         this.next = null;
     }
 
+    boolean hasCycle(){
+        Node rabbit = this;
+        Node turrtle = this;
+        while (rabbit.next != null){
+            rabbit = rabbit.next.next;
+            turrtle = turrtle.next;
+            if (rabbit == turrtle)
+                return true;
+        }
+        return false;
+    }
+
     @Override
     public void add(Object value) {
         Node newNode = new Node(value);
