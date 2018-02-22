@@ -2,56 +2,51 @@ package ru.job4j.service;
 
 import java.util.Iterator;
 
-public class SimpleSet implements Iterator{
-    Object[] container;
-    int index = 0;
-    int iteratorIndex = 0;
+public class SimpleSet<E> implements Iterable{
+    int itertatoIndex = 0;
+    Node Queu;
 
-    public SimpleSet (Object[] container) {
-        this.container = container;
+    public SimpleSet(E value){
+        this.Queu = new Node(value);
     }
 
-    public Object[] IncreaseContainer (Object[] container){
-        int index = 0;
-        Object[] copyContainer = new Object[container.length*2];
-        while (container.length > index) {
-            copyContainer[index] = container[index];
-            index++;
-        }
-        return copyContainer;
-    }
-
-    public void add(Object value) {
-        int i = 0;
-        while (i < index ){
-            if ( container[i] == value)
+    public void add(E value) {
+        Node copyNode = this.Queu;
+        while (copyNode.next != null){
+            if (copyNode.value == value)
                 return;
-            i++;
+            copyNode = copyNode.next;
         }
-        if (this.container.length  > index) {
-            this.container[index] = value;
-            index++;
-        } else {
-            this.container = IncreaseContainer(this.container);
-            this.container[index]   = value;
-            index++;
-        }
+        this.Queu.add(value);
     }
 
     @Override
-    public boolean hasNext() {
-        if ( container.length > iteratorIndex)
-            return true;
-        return false;
-    }
+    public Iterator iterator() {
+        return new Iterator() {
+            @Override
+            public boolean hasNext() {
+                int i = 0;
+                Node copyNode = Queu;
+                while (i < itertatoIndex && copyNode.next != null) {
+                    copyNode = copyNode.next;
+                    i++;
+                }
+                return copyNode.next != null;
+            }
 
-    @Override
-    public Object next() {
-        if ( container.length > iteratorIndex) {
-            iteratorIndex++;
-            return container[iteratorIndex - 1];
-        }
-        else
-            return null;
+            @Override
+            public Object next() {
+                int i = 0;
+                Node copyNode = Queu;
+                while (i < itertatoIndex && copyNode.next != null) {
+                    copyNode = copyNode.next;
+                    i++;
+                }
+                itertatoIndex++;
+                if (itertatoIndex > Queu.index)
+                    return null;
+                return copyNode.next.value;
+            }
+        };
     }
 }
