@@ -14,6 +14,7 @@ public class HashSet<E> {
 
     /**
      * Конструктор инициализирующий массив
+     *
      * @param users
      */
     public HashSet(Object[] users) {
@@ -22,6 +23,7 @@ public class HashSet<E> {
 
     /**
      * Метод add, добавляющий элемент в хэш-таблицу
+     *
      * @param e
      * @return
      */
@@ -29,10 +31,12 @@ public class HashSet<E> {
         int index = hashMake(e);
         while (true) {
             if (index < users.length) {
-                while (users[index] == null) {
-                    users[index]= e;
+                if (users[index] == e)
+                    return true;
+                if (users[index] == null) {
+                    users[index] = e;
                     tableFull++;
-                    double coeff= ((double)tableFull)/(double)users.length;
+                    double coeff = ((double) tableFull) / (double) users.length;
                     if (coeff > 0.75) {
                         users = growTable();
                         break;
@@ -40,11 +44,12 @@ public class HashSet<E> {
                     return true;
                 }
                 index++;
-            }
-            else
+            } else
                 return false;
         }
+        return true;
     }
+
 
     /**
      * Метод удваивающий хэш-таблицу
