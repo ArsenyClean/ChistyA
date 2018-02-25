@@ -16,40 +16,51 @@ public class Converter  {
     Iterator<Integer> convert(Iterator<Iterator<Integer>> it) {
         mainIt = it;
         innerIt = mainIt.next();
+        boolean endFlag = false;
 
-
-        Iterator<Integer> r = new Iterator<Integer>() {
+        Iterator<Integer> iterator = new Iterator<Integer>() {
             @Override
             public boolean hasNext() {
-                while (mainIt.hasNext()) {
-                    if (innerIt.hasNext())
-                        return true;
-                    else {
-                        innerIt = mainIt.next();
-                    }
+                int flag = searcher();
+                while (flag == 1){
+                    innerIt = mainIt.next();
+                    flag = searcher();
                 }
-                if (innerIt.hasNext())
+                if (flag == 0){
                     return true;
-                return false;
+                }else{
+                    return false;
+                }
             }
 
             @Override
-            public Integer next() {
+            public Integer next() throws NoSuchElementException{
+                int flag = searcher();
+                while (flag == 1){
+                    innerIt = mainIt.next();
+                    flag = searcher();
+                }
+                if (flag == 0 || flag == -1){
+                    return innerIt.next();
+                }
+                throw new NoSuchElementException();
+            }
+
+            public int searcher(){
                 while (mainIt.hasNext()){
                     if (innerIt.hasNext()){
-                        return innerIt.next();
+                        return 0;
                     }
                     else {
-                        innerIt = mainIt.next();
+                        return 1;
                     }
                 }
-                    if (innerIt.hasNext())
-                        while (innerIt.hasNext())
-                            return innerIt.next();
-
-                return innerIt.next();
+                while (innerIt.hasNext()) {
+                    return 0;
+                }
+                return -1;
             }
         };
-        return r;
+        return iterator;
     }
 }
