@@ -7,19 +7,18 @@ package ru.job4j.service;
  */
 public class UserStore implements Store {
 
-
-    SimpleArray<User> userStore;
+    private SimpleArray<User> userStore;
 
     /**
      * Конструктор с инициализацией хрнилища
      */
     public UserStore(int size) {
-        userStore = new SimpleArray<User>(size);
+        userStore = new SimpleArray<>(size);
     }
 
     /**
      * add добавляет элемент типа Base в массив
-     * @param model
+     * @param model добавляемый элемент
      */
     @Override
     public void add(Base model) {
@@ -28,8 +27,8 @@ public class UserStore implements Store {
 
     /**
      * replace заменяет элемнт массива на новый
-     * @param id
-     * @param model
+     * @param id значение заменяемого элемента
+     * @param model новый элеент для замены
      * @return true, если элемент найден и заменен,  false, если элемент не нйден
      */
     @Override
@@ -46,7 +45,7 @@ public class UserStore implements Store {
 
     /**
      * delete удаляет элемент из массива
-     * @param id
+     * @param id значение удаляемого элемента
      * @return true если элеменит найден и удален, false если элемент не найден
      */
     @Override
@@ -64,7 +63,7 @@ public class UserStore implements Store {
 
     /**
      * findById находит искомый элемент
-     * @param id
+     * @param id значение искомого элемента
      * @return null если элемент не нйден, Base если элемент найден
      */
     @Override
@@ -74,10 +73,9 @@ public class UserStore implements Store {
         if (result < 0) {
             return null;
         } else {
-            return (Base) userStore.objects[result];
+            return userStore.objects[result];
         }
     }
-
     /**
      * toString возвращает строковой эквивалент массива
      * @return String

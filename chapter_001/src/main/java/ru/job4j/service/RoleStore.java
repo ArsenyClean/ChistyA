@@ -7,18 +7,19 @@ package ru.job4j.service;
 public class RoleStore implements Store {
 
 
-    SimpleArray<Role> roleStore;
+    private SimpleArray<Role> roleStore;
 
     /**
      * Конструктор с инициализацией хрнилища
      */
     public RoleStore(int size) {
-        roleStore = new SimpleArray<Role>(size);
+        roleStore = new SimpleArray<>(size);
     }
+
 
     /**
      * add добавляет элемент типа Base в массив
-     * @param model
+     * @param model вставляемый в массив элемент
      */
     @Override
     public void add(Base model) {
@@ -27,13 +28,13 @@ public class RoleStore implements Store {
 
     /**
      * replace заменяет элемнт массива на новый
-     * @param id
-     * @param model
+     * @param id значение элемета который надо заменить
+     * @param model новое значение для замены
      * @return true, если элемент найден и заменен,  false, если элемент не нйден
      */
     @Override
     public boolean replace(String id, Base model) {
-        Helper<Role> helpUser = null;
+        Helper<Role> helpUser = new Helper<>();
         int result = helpUser.searcher(roleStore, id);
         if (result < 0) {
             return false;
@@ -45,12 +46,12 @@ public class RoleStore implements Store {
 
     /**
      * delete удаляет элемент из массива
-     * @param id
+     * @param id значение элемента для удаления
      * @return true если элеменит найден и удален, false если элемент не найден
      */
     @Override
     public boolean delete(String id) {
-        Helper<Role> helpUser = null;
+        Helper<Role> helpUser = new Helper<>();
         int result = helpUser.searcher(roleStore, id);
         if (result < 0) {
             return false;
@@ -63,17 +64,17 @@ public class RoleStore implements Store {
 
     /**
      * findById находит искомый элемент
-     * @param id
+     * @param id индекс искомого элемента
      * @return null если элемент не нйден, Base если элемент найден
      */
     @Override
     public Base findById(String id) {
-        Helper<Role> helpUser = null;
+        Helper<Role> helpUser = new Helper<>();
         int result = helpUser.searcher(roleStore, id);
         if (result < 0) {
             return null;
         } else {
-            return (Base) roleStore.objects[result];
+            return roleStore.objects[result];
         }
     }
 
