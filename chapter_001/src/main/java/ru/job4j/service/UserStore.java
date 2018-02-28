@@ -1,18 +1,36 @@
 package ru.job4j.service;
 
-public class UserStore<T> implements Store{
+/**
+ * UserStore яляется хранилищем для элементов типа User
+ * @author Chisty Arseny
+ * @since 28.02.2018
+ */
+public class UserStore implements Store{
 
     SimpleArray<User> userStore;
 
+    /**
+     * Конструктор с инициализацией хрнилища
+     */
     public UserStore(int size) {
         userStore = new SimpleArray<User>(size);
     }
 
+    /**
+     * add добавляет элемент типа Base в массив
+     * @param model
+     */
     @Override
     public void add(Base model) {
         userStore.add((User)model);
     }
 
+    /**
+     * replace заменяет элемнт массива на новый
+     * @param id
+     * @param model
+     * @return true, если элемент найден и заменен,  false, если элемент не нйден
+     */
     @Override
     public boolean replace(String id, Base model) {
         Helper<User> helpUser = new Helper<>();
@@ -25,6 +43,11 @@ public class UserStore<T> implements Store{
         }
     }
 
+    /**
+     * delete удаляет элемент из массива
+     * @param id
+     * @return true если элеменит найден и удален, false если элемент не найден
+     */
     @Override
     public boolean delete(String id) {
         Helper<User> helpUser = new Helper<>();
@@ -38,6 +61,11 @@ public class UserStore<T> implements Store{
         }
     }
 
+    /**
+     * findById находит искомый элемент
+     * @param id
+     * @return null если элемент не нйден, Base если элемент найден
+     */
     @Override
     public Base findById(String id) {
         Helper<User> helpUser = new Helper<>();
@@ -49,6 +77,10 @@ public class UserStore<T> implements Store{
         }
     }
 
+    /**
+     * toString возвращает строковой эквивалент массива
+     * @return String
+     */
     @Override
     public String toString() {
         Helper<User> helpUser = new Helper<>();

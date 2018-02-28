@@ -13,19 +13,36 @@ public class SimpleArray <T extends Base> implements Iterable<T>{
     int index = 0;
     int indexIterator = 0;
 
+    /**
+     * Конструктор, инициализирует массив и задает его длинну
+     * @param size
+     */
     public SimpleArray(int size){
         this.objects = new Base[size];
     }
 
+    /**
+     * add добавляет элемент в массив
+     * @param model
+     */
     public void add(T model){
         this.objects[index] = model;
         index++;
     }
 
+    /**
+     * set заменяет элемент массива
+     * @param position
+     * @param model
+     */
     public void set(int position, T model){
         this.objects[position] = model;
     }
 
+    /**
+     * Метод удаляет элемент из массива
+     * @param position
+     */
     public void delete(int position) {
         int i = position + 1;
         while (i < objects.length) {
@@ -36,10 +53,17 @@ public class SimpleArray <T extends Base> implements Iterable<T>{
         }
     }
 
+    /**
+     * Метод возвращает искомый элемент массива
+     * @param position
+     */
     public T get(int position){
         return (T) this.objects[position];
     }
 
+    /**
+     * Метод реализует итератор
+     */
     @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
