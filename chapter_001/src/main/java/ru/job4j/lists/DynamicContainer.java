@@ -1,21 +1,21 @@
-package ru.job4j.service;
+package ru.job4j.lists;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
-public class DynamicContainer <E> implements SimpleContainer, Iterable {
+public class DynamicContainer<E> implements SimpleContainer, Iterable {
 
-    Object[] container;
-    int index = 0;
-    int iteratorIndex = 0;
-    int modCount = 0;
+    private Object[] container;
+    private int index = 0;
+    private int iteratorIndex = 0;
+    private int modCount = 0;
 
     public DynamicContainer(Object[] container) {
         this.container = container;
         modCount++;
     }
 
-    public Object[] IncreaseContainer(Object[] container) {
+    private Object[] increaseContain(Object[] container) {
         int index = 0;
         Object[] copyContainer = new Object[container.length * 2];
         while (container.length > index) {
@@ -32,7 +32,7 @@ public class DynamicContainer <E> implements SimpleContainer, Iterable {
             this.container[index] = value;
             index++;
         } else {
-            this.container = IncreaseContainer(this.container);
+            this.container = increaseContain(this.container);
             this.container[index] = value;
             index++;
         }
@@ -52,10 +52,11 @@ public class DynamicContainer <E> implements SimpleContainer, Iterable {
             @Override
             public boolean hasNext() {
                 try {
-                    if (expectedModCount == modCount)
+                    if (expectedModCount == modCount) {
                         return container.length > iteratorIndex;
-                    else
+                    } else {
                         throw new ConcurrentModificationException();
+                    }
                 } catch (ConcurrentModificationException e) {
                     return false;
                 }
@@ -64,10 +65,11 @@ public class DynamicContainer <E> implements SimpleContainer, Iterable {
             @Override
             public Object next() {
                 try {
-                    if (expectedModCount == modCount)
+                    if (expectedModCount == modCount) {
                         return container[iteratorIndex];
-                    else
+                    } else {
                         throw new ConcurrentModificationException();
+                    }
                 } catch (ConcurrentModificationException e) {
                     return null;
                 }
@@ -75,4 +77,3 @@ public class DynamicContainer <E> implements SimpleContainer, Iterable {
         };
     }
 }
-
