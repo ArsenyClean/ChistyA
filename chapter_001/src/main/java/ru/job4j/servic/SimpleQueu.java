@@ -1,7 +1,6 @@
 package ru.job4j.servic;
 
 public class SimpleQueu<E> {
-
     private LinkedList queu = new LinkedList();
     private LinkedList.Node node = queu.first;
     private boolean end = false;

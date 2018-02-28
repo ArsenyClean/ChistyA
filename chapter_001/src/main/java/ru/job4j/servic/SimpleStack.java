@@ -1,15 +1,10 @@
 package ru.job4j.servic;
 
 public class SimpleStack<E> {
-
     LinkedList stack = new LinkedList();
     LinkedList.Node node = stack.first;
 
     public SimpleStack() { }
-
-    public SimpleStack(E value) {
-        this.node = new LinkedList.Node(value);
-    }
 
     @Override
     public String toString() {

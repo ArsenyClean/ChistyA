@@ -9,7 +9,6 @@ import java.util.Iterator;
  * @since 16.02.2018
  */
 public class LinkedList<E> implements SimpleContainer, Iterable {
-
     Node first = new Node();
     int index = 0;
     private int iterIndex = 0;
