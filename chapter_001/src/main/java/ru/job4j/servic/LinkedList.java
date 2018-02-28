@@ -18,6 +18,7 @@ public class LinkedList<E> implements SimpleContainer, Iterable {
     private int modCount = 0;
 
     public static class Node<E> {
+
         Node next;
         Node prev;
         E value;
