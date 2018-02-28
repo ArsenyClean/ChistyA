@@ -3,12 +3,11 @@ package ru.job4j.service;
 public abstract class Base {
     private final String id;
 
-    protected Base (final String id){
+    protected Base(final String id) {
         this.id = id;
     }
 
-    public String getId(){
+    public String getId() {
         return id;
     }
-
 }
