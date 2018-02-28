@@ -7,7 +7,8 @@ import java.util.Iterator;
  * @since 19.02.2018
  * @param <T>
  */
-public class SimpleArray <T extends Base> implements Iterable<T>{
+public class SimpleArray<T extends Base> implements Iterable<T> {
+
 
     Base[] objects;
     int index = 0;
@@ -17,7 +18,7 @@ public class SimpleArray <T extends Base> implements Iterable<T>{
      * Конструктор, инициализирует массив и задает его длинну
      * @param size
      */
-    public SimpleArray(int size){
+    public SimpleArray(int size) {
         this.objects = new Base[size];
     }
 
@@ -25,7 +26,7 @@ public class SimpleArray <T extends Base> implements Iterable<T>{
      * add добавляет элемент в массив
      * @param model
      */
-    public void add(T model){
+    public void add(T model) {
         this.objects[index] = model;
         index++;
     }
@@ -35,7 +36,7 @@ public class SimpleArray <T extends Base> implements Iterable<T>{
      * @param position
      * @param model
      */
-    public void set(int position, T model){
+    public void set(int position, T model) {
         this.objects[position] = model;
     }
 
@@ -57,7 +58,7 @@ public class SimpleArray <T extends Base> implements Iterable<T>{
      * Метод возвращает искомый элемент массива
      * @param position
      */
-    public T get(int position){
+    public T get(int position) {
         return (T) this.objects[position];
     }
 

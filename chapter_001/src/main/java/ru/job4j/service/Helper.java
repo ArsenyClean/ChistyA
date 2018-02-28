@@ -7,6 +7,7 @@ package ru.job4j.service;
  * @param <T> может быть User или Role
  */
 class Helper<T extends Base> {
+
     /**
      * seracher проводит поиск запрашиваемого элемента
      * @param store присылаем наш массив

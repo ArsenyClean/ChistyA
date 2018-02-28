@@ -4,7 +4,8 @@ package ru.job4j.service;
  * @author Chisty Arseny
  * @since 28.02.2018
  */
-public class RoleStore implements Store{
+public class RoleStore implements Store {
+
 
     SimpleArray<Role> roleStore;
 
@@ -21,7 +22,7 @@ public class RoleStore implements Store{
      */
     @Override
     public void add(Base model) {
-        roleStore.add((Role)model);
+        roleStore.add((Role) model);
     }
 
     /**
@@ -34,7 +35,7 @@ public class RoleStore implements Store{
     public boolean replace(String id, Base model) {
         Helper<Role> helpUser = null;
         int result = helpUser.searcher(roleStore, id);
-        if (result < 0){
+        if (result < 0) {
             return false;
         } else {
             roleStore.objects[result] = model;
@@ -51,12 +52,12 @@ public class RoleStore implements Store{
     public boolean delete(String id) {
         Helper<Role> helpUser = null;
         int result = helpUser.searcher(roleStore, id);
-        if (result < 0){
+        if (result < 0) {
             return false;
         } else {
-            helpUser.shifter(roleStore, result);
+            boolean resultShift = helpUser.shifter(roleStore, result);
             roleStore.index--;
-            return true;
+            return resultShift;
         }
     }
 

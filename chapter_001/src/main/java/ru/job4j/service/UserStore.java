@@ -5,7 +5,8 @@ package ru.job4j.service;
  * @author Chisty Arseny
  * @since 28.02.2018
  */
-public class UserStore implements Store{
+public class UserStore implements Store {
+
 
     SimpleArray<User> userStore;
 
@@ -22,7 +23,7 @@ public class UserStore implements Store{
      */
     @Override
     public void add(Base model) {
-        userStore.add((User)model);
+        userStore.add((User) model);
     }
 
     /**
@@ -35,7 +36,7 @@ public class UserStore implements Store{
     public boolean replace(String id, Base model) {
         Helper<User> helpUser = new Helper<>();
         int result = helpUser.searcher(userStore, id);
-        if (result < 0){
+        if (result < 0) {
             return false;
         } else {
             userStore.objects[result] = model;
@@ -52,12 +53,12 @@ public class UserStore implements Store{
     public boolean delete(String id) {
         Helper<User> helpUser = new Helper<>();
         int result = helpUser.searcher(userStore, id);
-        if (result < 0){
+        if (result < 0) {
             return false;
         } else {
-            helpUser.shifter(userStore, result);
+            boolean resultShift = helpUser.shifter(userStore, result);
             userStore.index--;
-            return true;
+            return resultShift;
         }
     }
 
@@ -70,7 +71,7 @@ public class UserStore implements Store{
     public Base findById(String id) {
         Helper<User> helpUser = new Helper<>();
         int result = helpUser.searcher(userStore, id);
-        if (result < 0){
+        if (result < 0) {
             return null;
         } else {
             return (Base) userStore.objects[result];
