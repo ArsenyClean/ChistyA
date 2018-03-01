@@ -20,33 +20,29 @@ public class EvenNumbersIterator implements Iterator {
 
     @Override
     public boolean hasNext() {
-        int copyIndexI = indexI;
-        while (array.length > copyIndexI) {
-            if (array[copyIndexI] % 2 == 0) {
-                return true;
-            } else {
-                copyIndexI++;
-            }
-        }
-        return false;
+        int result = reacher();
+        return result >= 0;
     }
 
     @Override
     public Object next() throws NoSuchElementException {
-        if (indexI >= array.length) {
-            throw new NoSuchElementException();
+        int result = reacher();
+        if (result >= 0) {
+            indexI = result + 1;
+            return array[result];
         }
-        if (!hasNext()) {
-            return null;
+        throw new NoSuchElementException();
+    }
+
+    public int reacher() {
+        int copyIndex = indexI;
+        while (copyIndex < array.length) {
+            if (array[copyIndex] % 2 == 0) {
+                return copyIndex;
+            } else {
+                copyIndex++;
+            }
         }
-        while (indexI <= array.length) {
-             if (array[indexI] % 2 == 0) {
-                 indexI++;
-                 return array[indexI - 1];
-             } else {
-                 indexI++;
-             }
-        }
-        return null;
+        return -1;
     }
 }
