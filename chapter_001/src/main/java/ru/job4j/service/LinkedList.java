@@ -2,25 +2,23 @@ package ru.job4j.service;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Class LinkedList
  * @author Chisty Arseny
  * @since 16.02.2018
  */
-public class LinkedList<E> implements SimpleContainer, Iterable {
+public class LinkedList<E> implements SimpleContainer<E>, Iterable<E> {
 
-    public Node first = new Node();
-    int index = 0;
-    private int iterIndex = 0;
+    public Node<E> first = new Node<E>();
 
-    private int expectedModCount = 0;
     private int modCount = 0;
 
     public static class Node<E> {
 
-        Node next;
-        Node prev;
+        Node<E> next;
+        Node<E> prev;
         E value;
 
         public Node() {
@@ -64,21 +62,20 @@ public class LinkedList<E> implements SimpleContainer, Iterable {
     }
 
     @Override
-    public void add(Object value) {
-        Node newNode = new Node(value);
-        Node counterNode = this.first;
+    public void add(E value) {
+        Node<E> newNode = new Node<E>(value);
+        Node<E> counterNode = this.first;
         while (counterNode.next != null) {
             counterNode = counterNode.next;
         }
         counterNode.next = newNode;
         newNode.prev = counterNode;
         modCount++;
-        index++;
     }
 
     @Override
-    public Object get(int index) {
-        Node counterNode = this.first;
+    public E get(int index) {
+        Node<E> counterNode = this.first;
         int counter = 0;
         while (counter < index && counterNode != null) {
             counterNode = counterNode.next;
@@ -91,43 +88,31 @@ public class LinkedList<E> implements SimpleContainer, Iterable {
     }
 
     @Override
-    public Iterator iterator() {
-        expectedModCount = modCount;
-        Node currentNode = this.first;
-        return new Iterator() {
+    public Iterator<E> iterator() {
+        return new Iterator<E>() {
+            private int expectedModCount = modCount;
+            private Node<E> currentNode = first.next;
+
             @Override
-            public boolean hasNext() throws ConcurrentModificationException {
-                if (expectedModCount == modCount) {
-                    Node counterNode = currentNode;
-                    counterNode = reacher(counterNode);
-                    return counterNode.next != null;
-                } else {
-                    throw new ConcurrentModificationException();
-                }
+            public boolean hasNext() {
+                return currentNode != null;
             }
 
             @Override
-            public Object next() {
-                if (expectedModCount == modCount) {
-                    Node counterNode = currentNode;
-                    counterNode = reacher(counterNode);
-                    iterIndex++;
-                    if (counterNode == null) {
-                        return null;
-                    }
-                    return counterNode.value;
-                } else {
-                    throw new ConcurrentModificationException();
+            public E next() {
+                checkForCoModification();
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
                 }
+                E result = currentNode.value;
+                currentNode = currentNode.next;
+                return result;
             }
 
-            Node reacher(Node node) {
-                int counter = 0;
-                while (iterIndex > counter && node != null) {
-                    node = node.next;
-                    counter++;
+            private void checkForCoModification() {
+                if (expectedModCount != modCount) {
+                    throw new ConcurrentModificationException();
                 }
-                return node;
             }
         };
     }
