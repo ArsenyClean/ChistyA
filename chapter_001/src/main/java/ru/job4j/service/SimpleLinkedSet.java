@@ -1,18 +1,18 @@
-package ru.job4j.servic;
+package ru.job4j.service;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 public class SimpleLinkedSet<E> implements Iterable<E> {
 
-    private int iterIndex = 0;
-    private int index = 0;
-    private int expectedModCount = 0;
-    private int modCount = 0;
-    private LinkedList list = new LinkedList();
-    private LinkedList.Node set = list.first;
+    public int iterIndex = 0;
+    public int index = 0;
+    public int expectedModCount = 0;
+    public int modCount = 0;
+    public LinkedList list = new LinkedList();
+    public LinkedList.Node set = list.first;
 
-    SimpleLinkedSet() { }
+    public SimpleLinkedSet() { }
 
     public SimpleLinkedSet(E value) {
         this.set = new LinkedList.Node(value);
@@ -46,7 +46,7 @@ public class SimpleLinkedSet<E> implements Iterable<E> {
         return builder.toString();
     }
 
-    private LinkedList.Node reacher(LinkedList.Node container, E value) {
+    public LinkedList.Node reacher(LinkedList.Node container, E value) {
         while (container.next != null) {
             if (container.next.value.equals(value)) {
                 return null;

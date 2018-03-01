@@ -1,4 +1,4 @@
-package ru.job4j.servic;
+package ru.job4j.service;
 
 public interface SimpleContainer<E> {
     void add(E value);

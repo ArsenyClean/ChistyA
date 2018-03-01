@@ -11,42 +11,41 @@ import java.util.NoSuchElementException;
 
 public class EvenNumbersIterator implements Iterator {
 
-    public static void main(String[] args){
+    private int[] array;
+    private int indexI = 0;
 
-    }
-
-    private int [] Array;
-    public int indexI = 0;
-
-    public EvenNumbersIterator(final int[] Array) {
-        this.Array = Array;
+    public EvenNumbersIterator(final int[] array) {
+        this.array = array;
     }
 
     @Override
-    public boolean hasNext()  {
+    public boolean hasNext() {
         int copyIndexI = indexI;
-        while (Array.length > copyIndexI) {
-            if (Array[copyIndexI] % 2 == 0)
+        while (array.length > copyIndexI) {
+            if (array[copyIndexI] % 2 == 0) {
                 return true;
-            else
+            } else {
                 copyIndexI++;
+            }
         }
         return false;
     }
 
     @Override
     public Object next() throws NoSuchElementException {
-        if (indexI >= Array.length)
+        if (indexI >= array.length) {
             throw new NoSuchElementException();
-        if (!hasNext())
+        }
+        if (!hasNext()) {
             return null;
-        while (indexI <= Array.length) {
-             if (Array[indexI] % 2 == 0) {
+        }
+        while (indexI <= array.length) {
+             if (array[indexI] % 2 == 0) {
                  indexI++;
-                 return Array[indexI - 1];
+                 return array[indexI - 1];
+             } else {
+                 indexI++;
              }
-             else
-                 indexI++;
         }
         return null;
     }

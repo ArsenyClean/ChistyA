@@ -1,34 +1,48 @@
 package ru.job4j.service;
 
-public class SimpleQueu <E> {
+public class SimpleQueu<E> {
+    private LinkedList queu = new LinkedList();
+    private LinkedList.Node node = queu.first;
+    private boolean end = false;
 
-    Node Queu;
-    boolean end = false;
+    public SimpleQueu() { }
 
-    public SimpleQueu(){
-        this.Queu = null;
-    }
+    public SimpleQueu(E value) {
 
-    public SimpleQueu(E value){
-        this.Queu = new Node(value);
+        this.node = new LinkedList.Node(value);
     }
 
     public E poll() {
-        if (end)
+        if (end) {
             return null;
-        if (Queu.next == null) {
-            end = true;
-            return (E) Queu.value;
         }
-        E valuee = (E) Queu.value;
-        Queu = Queu.next;
-        Queu.prev.next = null;
-        Queu.prev = null;
+        if (node.next == null) {
+            end = true;
+            return (E) node.value;
+        }
+        E valuee = (E) node.value;
+        node = node.next;
+        node.prev.next = null;
+        node.prev = null;
         return valuee;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        LinkedList.Node copyNode = node;
+        while (copyNode.next != null) {
+            String string = "[" + i + "]=" + copyNode.next.value.toString() + " ";
+            builder.append(string);
+            i++;
+            copyNode = copyNode.next;
+        }
+        return builder.toString();
+    }
+
     public void push(E value) {
-        this.Queu.add(value);
+        this.queu.add(value);
         end = false;
     }
 }

@@ -11,30 +11,27 @@ import java.util.NoSuchElementException;
 
 public class PrimeIterator implements Iterator {
 
-    public static void main(String[] args){
+    private int[] array;
+    private int indexI = 0;
 
-    }
-
-    private int [] Array;
-    public int indexI = 0;
-
-    public PrimeIterator(final int[] Array) {
-        this.Array = Array;
+    public PrimeIterator(final int[] array) {
+        this.array = array;
     }
 
     @Override
-    public boolean hasNext()  {
+    public boolean hasNext() {
         int copyIndexI = indexI;
-        while (Array.length > copyIndexI) {
+        while (array.length > copyIndexI) {
             boolean flagIsFind = true;
-            for ( int i = Array[indexI] - 1; i > 1; i-- ){
-                if ( Array[indexI] % i == 0 ){
+            for (int i = array[indexI] - 1; i > 1; i--) {
+                if (array[indexI] % i == 0) {
                     flagIsFind = false;
                     break;
                 }
             }
-            if (flagIsFind)
+            if (flagIsFind) {
                 return true;
+            }
             copyIndexI++;
         }
         return false;
@@ -42,27 +39,30 @@ public class PrimeIterator implements Iterator {
 
     @Override
     public Object next() throws NoSuchElementException {
-        if (indexI >= Array.length)
+        if (indexI >= array.length) {
             throw new NoSuchElementException();
-        if (!hasNext())
+        }
+        if (!hasNext()) {
             return null;
-        while (Array.length > indexI) {
-            if ( Array[indexI] == 1)
+        }
+        while (array.length > indexI) {
+            if (array[indexI] == 1) {
                 indexI++;
-            if (Array[indexI] == 2) {
+            }
+            if (array[indexI] == 2) {
                 indexI++;
-                return Array[indexI - 1];
+                return array[indexI - 1];
             }
             boolean flagIsFind = true;
-            for ( int i = 2; i < Array[indexI]; i++ ){
-                if ( Array[indexI] % i == 0 ){
+            for (int i = 2; i < array[indexI]; i++) {
+                if (array[indexI] % i == 0) {
                     flagIsFind = false;
                     break;
                 }
             }
             if (flagIsFind) {
                 indexI++;
-                return Array[indexI - 1];
+                return array[indexI - 1];
             }
             indexI++;
         }

@@ -1,4 +1,4 @@
-package ru.job4j.servic;
+package ru.job4j.service;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -10,7 +10,7 @@ import java.util.Iterator;
  */
 public class LinkedList<E> implements SimpleContainer, Iterable {
 
-    Node first = new Node();
+    public Node first = new Node();
     int index = 0;
     private int iterIndex = 0;
 

@@ -1,20 +1,28 @@
 package ru.job4j.service;
 
-public class SimpleStack<E>  {
+public class SimpleStack<E> {
+    public LinkedList stack = new LinkedList();
+    public LinkedList.Node node = stack.first;
 
-    Node Stack;
+    public SimpleStack() { }
 
-    public SimpleStack(){
-        this.Stack = null;
-    }
-
-    public SimpleStack(E value){
-        this.Stack = new Node(value);
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        LinkedList.Node copyNode = node;
+        while (copyNode.next != null) {
+            String string = "[" + i + "]=" + copyNode.next.value.toString() + " ";
+            builder.append(string);
+            i++;
+            copyNode = copyNode.next;
+        }
+        return builder.toString();
     }
 
     public E poll() {
-        Node counterNode = Stack;
-        while (counterNode.next != null){
+        LinkedList.Node counterNode = node;
+        while (counterNode.next != null) {
             counterNode = counterNode.next;
         }
         if (counterNode.prev != null) {
@@ -25,6 +33,8 @@ public class SimpleStack<E>  {
     }
 
     public void push(E value) {
-        this.Stack.add(value);
+
+
+        this.stack.add(value);
     }
 }

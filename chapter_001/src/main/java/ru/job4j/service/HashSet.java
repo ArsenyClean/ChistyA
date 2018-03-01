@@ -8,14 +8,12 @@ package ru.job4j.service;
 
 public class HashSet<E> {
 
-    Object[] users;
-    int hashConst = 16;
-    int tableFull = 0;
+    private Object[] users;
+    private int tableFull = 0;
 
     /**
      * Конструктор инициализирующий массив
-     *
-     * @param users
+     * @param users принимает массив
      */
     public HashSet(Object[] users) {
         this.users = users;
@@ -23,113 +21,82 @@ public class HashSet<E> {
 
     /**
      * Метод add, добавляющий элемент в хэш-таблицу
-     *
-     * @param e
-     * @return
+     * @param e принимает элемент для добавления
+     * @return true, если опирация выполнилась, и false, если не выполнилась
      */
-    boolean add(E e) {
-        int index = hashMake(e);
-        while (true) {
-            if (index < users.length) {
-                if (users[index] == e)
-                    return true;
-                if (users[index] == null) {
-                    users[index] = e;
-                    tableFull++;
-                    double coeff = ((double) tableFull) / (double) users.length;
-                    if (coeff > 0.75) {
-                        users = growTable();
-                        break;
-                    }
-                    return true;
-                }
-                index++;
-            } else
-                return false;
+    public boolean add(E e) {
+        int index = hashCode(e);
+        if (users[index] == null) {
+            users[index] = e;
+            tableFull++;
+            double coeff = ((double) tableFull) / (double) users.length;
+            if (coeff > 0.75) {
+                users = growTable();
+            }
+            return true;
         }
-        return true;
+        return false;
     }
-
 
     /**
      * Метод удваивающий хэш-таблицу
-     * @return
+     * @return увеличенный массив
      */
-    Object[] growTable() {
-        Object[] usersCop = new Object[users.length*2];
-        for ( int i = 0; i < users.length; i++ ) {
-            usersCop[i] = users[i];
+    public Object[] growTable() {
+        Object[] usersCopy = new Object[users.length * 2];
+        HashSet set = new HashSet(usersCopy);
+        for (int i = 0; i < users.length; i++) {
+            set.add(users[i]);
         }
-        return usersCop;
+        return set.users;
     }
 
     /**
      * Метод, проверяющий, содержит ли хэш-таблица элемент е
-     * @param e
-     * @return
+     * @param e проверяемый элемент
+     * @return true, если опирация выполнилась, и false, если не выполнилась
      */
-    boolean contains(E e) {
-        int index = hashMake(e);
-        while (true) {
-            if (index < users.length) {
-                while (users[index] != null) {
-                    if (users[index] == e) {
-                        index++;
-                        return true;
-                    }
-                    index++;
-                }
-                index++;
-            }
-            else
-                return false;
-        }
+    public boolean contains(E e) {
+        int index = hashCode(e);
+        return users[index].equals(e);
     }
 
     /**
      * Метод, удаляющий элемент е
-     * @param e
-     * @return
+     * @param e удаляемый элемент
+     * @return true, если опирация выполнилась, и false, если не выполнилась
      */
-    boolean remove(E e) {
-        int index = hashMake(e);
-        int flagEnd = index;
-        boolean endFound = false;
-        while (true) {
-            if (index < users.length) {
-                while (users[index] != null) {
-                    if (users[index] == e) {
-                        flagEnd++;
-                        endFound = true;
-                    }
-                    index++;
-                    if (index < users.length)
-                        if (users[index] != e) {
-                            flagEnd--;
-                            break;
-                        }
-                    if (index >= users.length) {
-                        flagEnd--;
-                        break;
-                    }
-                }
-                if (endFound) {
-                    users[flagEnd] = null;
-                    return true;
-                }
-                index++;
-            }
-            else
-                return false;
+    public boolean remove(E e) {
+        int index = hashCode(e);
+        if (users[index] == null) {
+            return false;
+        } else {
+            users[index] = null;
+            return true;
         }
     }
 
     /**
      * Метод, вычисляющий хэш-функцию
-     * @param value
-     * @return
+     * @param value принимает значение для вычисления хэш-кода
+     * @return возвращает вычисленный хэш-код
      */
-    int hashMake(E value) {
-        return (((Integer) value) * hashConst) % users.length;
+    public int hashCode(E value) {
+        int hashConst = 31;
+        int result = (value.hashCode() * hashConst) % users.length;
+        if (result >= 0) {
+            return result;
+        }
+        return ((value.hashCode() & 0x7fffffff)) % users.length;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < users.length; i++) {
+            String string = "[" + i + "]=" + users[i] + " ";
+            builder.append(string);
+        }
+        return builder.toString();
     }
 }
