@@ -44,11 +44,13 @@ public class HashSet<E> {
      */
     public Object[] growTable() {
         Object[] usersCopy = new Object[users.length * 2];
-        HashSet set = new HashSet(usersCopy);
+        HashSet newSet = new HashSet(usersCopy);
         for (int i = 0; i < users.length; i++) {
-            set.add(users[i]);
+            if (users[i] != null) {
+                newSet.add(users[i]);
+            }
         }
-        return set.users;
+        return newSet.users;
     }
 
     /**
@@ -58,7 +60,10 @@ public class HashSet<E> {
      */
     public boolean contains(E e) {
         int index = hashCode(e);
-        return users[index].equals(e);
+        if (users[index] != null) {
+            return users[index].equals(e);
+        }
+        return false;
     }
 
     /**
