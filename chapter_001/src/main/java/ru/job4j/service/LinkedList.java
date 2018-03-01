@@ -10,7 +10,6 @@ import java.util.NoSuchElementException;
  * @since 16.02.2018
  */
 public class LinkedList<E> implements SimpleContainer<E>, Iterable<E> {
-
     public Node<E> first = new Node<E>();
 
     private int modCount = 0;

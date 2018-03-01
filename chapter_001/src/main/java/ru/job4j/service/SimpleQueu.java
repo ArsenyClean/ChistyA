@@ -1,26 +1,23 @@
 package ru.job4j.service;
 
+import java.util.NoSuchElementException;
+
 public class SimpleQueu<E> {
-    private LinkedList queu = new LinkedList();
-    private LinkedList.Node node = queu.first;
+    private LinkedList<E> queu = new LinkedList<E>();
+    private LinkedList.Node<E> node = queu.first;
     private boolean end = false;
 
     public SimpleQueu() { }
 
     public SimpleQueu(E value) {
-
-        this.node = new LinkedList.Node(value);
+        this.node = new LinkedList.Node<E>(value);
     }
 
     public E poll() {
-        if (end) {
-            return null;
-        }
         if (node.next == null) {
-            end = true;
-            return (E) node.value;
+            throw new NoSuchElementException();
         }
-        E valuee = (E) node.value;
+        E valuee = node.next.value;
         node = node.next;
         node.prev.next = null;
         node.prev = null;
