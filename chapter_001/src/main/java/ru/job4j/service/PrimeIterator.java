@@ -20,52 +20,41 @@ public class PrimeIterator implements Iterator {
 
     @Override
     public boolean hasNext() {
-        int copyIndexI = indexI;
-        while (array.length > copyIndexI) {
-            boolean flagIsFind = true;
-            for (int i = array[indexI] - 1; i > 1; i--) {
-                if (array[indexI] % i == 0) {
-                    flagIsFind = false;
-                    break;
-                }
-            }
-            if (flagIsFind) {
-                return true;
-            }
-            copyIndexI++;
-        }
-        return false;
+        int result = reacher();
+        return result >= 0;
     }
 
     @Override
     public Object next() throws NoSuchElementException {
-        if (indexI >= array.length) {
+        if (!hasNext()) {
             throw new NoSuchElementException();
         }
-        if (!hasNext()) {
-            return null;
-        }
+        int result = reacher();
+        indexI++;
+        return array[result];
+    }
+
+    public int reacher() {
         while (array.length > indexI) {
             if (array[indexI] == 1) {
                 indexI++;
-            }
-            if (array[indexI] == 2) {
-                indexI++;
-                return array[indexI - 1];
-            }
-            boolean flagIsFind = true;
-            for (int i = 2; i < array[indexI]; i++) {
-                if (array[indexI] % i == 0) {
-                    flagIsFind = false;
-                    break;
+            } else {
+                if (array[indexI] == 2) {
+                    return indexI;
                 }
-            }
-            if (flagIsFind) {
+                boolean flagIsFind = true;
+                for (int i = 2; i < array[indexI]; i++) {
+                    if (array[indexI] % i == 0) {
+                        flagIsFind = false;
+                        break;
+                    }
+                }
+                if (flagIsFind) {
+                    return indexI;
+                }
                 indexI++;
-                return array[indexI - 1];
             }
-            indexI++;
         }
-        return null;
+        return -1;
     }
 }
