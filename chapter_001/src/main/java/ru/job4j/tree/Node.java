@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node<E extends Comparable<E>> {
-
     private final List<Node<E>> children = new ArrayList<Node<E>>();
     private final E value;
 
