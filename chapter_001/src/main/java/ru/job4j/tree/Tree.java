@@ -13,7 +13,7 @@ public class Tree<E extends Comparable<E>> implements SimpleTree<E> {
     private int modCount = 0;
 
     public Tree(E first) {
-        this.root  = new Node(first);
+        this.root = new Node(first);
     }
 
     private int compare(Node<E> node, E parent) {
@@ -48,23 +48,17 @@ public class Tree<E extends Comparable<E>> implements SimpleTree<E> {
 
     @Override
     public boolean add(E parent, E child) {
-        Queue<Node<E>> queue = new LinkedList<>();
-        queue.offer(this.root);
-        while (!queue.isEmpty()) {
-            Node<E> node = queue.poll();
-            if (compare(node, parent) == 0) {
-                if (findChild(node, child)) {
-                    return false;
-                }
-                node.add(new Node(child));
-                modCount++;
-                return true;
-            }
-            for (Node<E> leave : node.leaves()) {
-                queue.offer(leave);
-            }
+        Optional<Node<E>> result = findBy(parent);
+        if (!result.isPresent()) {
+            return false;
         }
-        return false;
+        Node<E> node = result.get();
+        if (findChild(node, child)) {
+            return false;
+        }
+        node.add(new Node(child));
+        modCount++;
+        return true;
     }
 
     @Override
