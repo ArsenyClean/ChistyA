@@ -2,6 +2,7 @@ package ru.job4j.service;
 
 import ru.job4j.lists.SimpleContainer;
 
+import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
@@ -9,21 +10,14 @@ public class DynamicContainer<E> implements SimpleContainer, Iterable {
 
     private Object[] container;
     private int index = 0;
-    private int iteratorIndex = 0;
     private int modCount = 0;
 
     public DynamicContainer(Object[] container) {
         this.container = container;
-        modCount++;
     }
 
     private Object[] increaseContain(Object[] container) {
-        int index = 0;
-        Object[] copyContainer = new Object[container.length * 2];
-        while (container.length > index) {
-            copyContainer[index] = container[index];
-            index++;
-        }
+        Object[] copyContainer = Arrays.copyOf(container, container.length * 2);
         modCount++;
         return copyContainer;
     }
@@ -43,7 +37,6 @@ public class DynamicContainer<E> implements SimpleContainer, Iterable {
 
     @Override
     public Object get(int index) {
-        modCount++;
         return this.container[index];
     }
 
@@ -51,29 +44,23 @@ public class DynamicContainer<E> implements SimpleContainer, Iterable {
     public Iterator iterator() {
         int expectedModCount = modCount;
         return new Iterator() {
+            private int iteratorIndex = 0;
             @Override
             public boolean hasNext() {
-                try {
-                    if (expectedModCount == modCount) {
-                        return container.length > iteratorIndex;
-                    } else {
-                        throw new ConcurrentModificationException();
-                    }
-                } catch (ConcurrentModificationException e) {
-                    return false;
-                }
+                modCheck();
+                return container.length > iteratorIndex;
             }
 
             @Override
             public Object next() {
-                try {
-                    if (expectedModCount == modCount) {
-                        return container[iteratorIndex];
-                    } else {
-                        throw new ConcurrentModificationException();
-                    }
-                } catch (ConcurrentModificationException e) {
-                    return null;
+                hasNext();
+                iteratorIndex++;
+                return container[iteratorIndex - 1];
+            }
+
+            private void  modCheck() {
+                if (expectedModCount == modCount) {
+                    throw new ConcurrentModificationException();
                 }
             }
         };
