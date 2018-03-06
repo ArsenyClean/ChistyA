@@ -27,6 +27,13 @@ public class HashMap<K, V> implements Iterable<V> {
             this.key = key;
             this.value = value;
         }
+
+        @Override
+        public int hashCode() {
+            int result = key != null ? key.hashCode() : 0;
+            result = 31 * result + (value != null ? value.hashCode() : 0);
+            return result;
+        }
     }
 
     public boolean insert(K key, V value) {
@@ -108,7 +115,8 @@ public class HashMap<K, V> implements Iterable<V> {
     }
 
     private int indexMake(int hash, int length) {
-        return ((hash * 31) & 0x7fffffff) % length;
+        int result = ((hash * 31) & 0x7fffffff) % length;
+        return result;
     }
 
     @Override
@@ -119,7 +127,8 @@ public class HashMap<K, V> implements Iterable<V> {
             @Override
             public boolean hasNext() {
                 checkModCount();
-                return (searchForNext() > 0);
+                int result = searchForNext();
+                return (result > 0);
             }
 
             @Override
