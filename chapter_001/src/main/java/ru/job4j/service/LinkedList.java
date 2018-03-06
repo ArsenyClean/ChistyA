@@ -1,8 +1,6 @@
 package ru.job4j.service;
 
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Class LinkedList
@@ -10,7 +8,11 @@ import java.util.NoSuchElementException;
  * @since 16.02.2018
  */
 public class LinkedList<E> implements SimpleContainer<E>, Iterable<E> {
-    public Node<E> first = new Node<E>();
+    public Node<E> first;
+
+    public LinkedList() {
+        first = new Node<E>();
+    }
 
     private int modCount = 0;
 

@@ -2,29 +2,26 @@ package ru.job4j.service;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class SimpleLinkedSet<E> implements Iterable<E> {
 
-    public int iterIndex = 0;
     public int index = 0;
-    public int expectedModCount = 0;
-    public int modCount = 0;
-    public LinkedList list = new LinkedList();
-    public LinkedList.Node set = list.first;
-
-    public SimpleLinkedSet() { }
+    int modCount = 0;
+    public LinkedList<E> list = new LinkedList<E>();
 
     public SimpleLinkedSet(E value) {
-        this.set = new LinkedList.Node(value);
+        list.add(value);
     }
+    public SimpleLinkedSet() { }
 
     public void add(E value) {
-        LinkedList.Node copyNode = this.set;
+        LinkedList.Node copyNode = list.first;
         copyNode = reacher(copyNode, value);
         if (copyNode == null) {
             return;
         } else {
-            LinkedList.Node newNode = new LinkedList.Node(value);
+            LinkedList.Node<E> newNode = new LinkedList.Node(value);
             copyNode.next = newNode;
             newNode.prev = copyNode;
         }
@@ -36,7 +33,7 @@ public class SimpleLinkedSet<E> implements Iterable<E> {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         int i = 0;
-        LinkedList.Node copyNode = set;
+        LinkedList.Node copyNode = list.first;
         while (copyNode.next != null) {
             String string = "[" + i + "]=" + copyNode.next.value.toString() + " ";
             builder.append(string);
@@ -57,44 +54,29 @@ public class SimpleLinkedSet<E> implements Iterable<E> {
     }
 
     @Override
-    public Iterator<E> iterator() {
-        expectedModCount = modCount;
-        LinkedList.Node currentNode = set;
-        return new Iterator<E>() {
+    public Iterator iterator() {
+        int expectedModCount = modCount;
+        LinkedList.Node currentNode = this.list.first;
+        Iterator<E> it = this.list.iterator();
+        return new Iterator() {
             @Override
-            public boolean hasNext() throws ConcurrentModificationException {
-                if (expectedModCount == modCount) {
-                    LinkedList.Node counterNode = currentNode;
-                    counterNode = reacher(counterNode);
-                    return counterNode.next != null;
-                } else {
-                    throw new ConcurrentModificationException();
-                }
+            public boolean hasNext() {
+                catcher();
+                return it.hasNext();
             }
 
             @Override
-            public E next() {
-                if (expectedModCount == modCount) {
-                    LinkedList.Node counterNode = currentNode;
-                    counterNode = reacher(counterNode);
-                    iterIndex++;
-                    if (counterNode.next == null) {
-                        throw new ConcurrentModificationException();
-                    } else {
-                        return (E) counterNode.next.value;
-                    }
-                } else {
-                    throw new ConcurrentModificationException();
+            public Object next() {
+                if (hasNext()) {
+                    return it.next();
                 }
+                throw new NoSuchElementException();
             }
 
-            LinkedList.Node reacher(LinkedList.Node node) {
-                int counter = 0;
-                while (iterIndex > counter && node.next != null) {
-                    node = node.next;
-                    counter++;
+            private void catcher() {
+                if (modCount != expectedModCount) {
+                    throw new ConcurrentModificationException();
                 }
-                return node;
             }
         };
     }
