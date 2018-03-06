@@ -1,19 +1,18 @@
-package ru.job4j.service;
+package ru.job4j.store;
 /**
  * RoleStore яляется хранилищем для элементов типа Role
  * @author Chisty Arseny
  * @since 28.02.2018
  */
-public class RoleStore implements Store {
+public class RoleStore<T extends Base> implements Store<T> {
 
-
-    private SimpleArray<Role> roleStore;
+    private SimpleArray<T> data;
 
     /**
      * Конструктор с инициализацией хрнилища
      */
     public RoleStore(int size) {
-        roleStore = new SimpleArray<>(size);
+        data = new SimpleArray(size);
     }
 
 
@@ -23,7 +22,7 @@ public class RoleStore implements Store {
      */
     @Override
     public void add(Base model) {
-        roleStore.add((Role) model);
+        data.add((T) model);
     }
 
     /**
@@ -33,13 +32,13 @@ public class RoleStore implements Store {
      * @return true, если элемент найден и заменен,  false, если элемент не нйден
      */
     @Override
-    public boolean replace(String id, Base model) {
-        Helper<Role> helpUser = new Helper<>();
-        int result = helpUser.searcher(roleStore, id);
+    public boolean replace(String id, T model) {
+        Helper<T> helpUser = new Helper<T>();
+        int result = helpUser.searcher(data, id);
         if (result < 0) {
             return false;
         } else {
-            roleStore.objects[result] = model;
+            data.objects[result] = model;
             return true;
         }
     }
@@ -51,13 +50,13 @@ public class RoleStore implements Store {
      */
     @Override
     public boolean delete(String id) {
-        Helper<Role> helpUser = new Helper<>();
-        int result = helpUser.searcher(roleStore, id);
+        Helper<T> helpUser = new Helper<T>();
+        int result = helpUser.searcher(data, id);
         if (result < 0) {
             return false;
         } else {
-            boolean resultShift = helpUser.shifter(roleStore, result);
-            roleStore.index--;
+            boolean resultShift = helpUser.shifter(data, result);
+            data.index--;
             return resultShift;
         }
     }
@@ -68,13 +67,13 @@ public class RoleStore implements Store {
      * @return null если элемент не нйден, Base если элемент найден
      */
     @Override
-    public Base findById(String id) {
-        Helper<Role> helpUser = new Helper<>();
-        int result = helpUser.searcher(roleStore, id);
+    public T findById(String id) {
+        Helper<T> helpUser = new Helper<T>();
+        int result = helpUser.searcher(data, id);
         if (result < 0) {
             return null;
         } else {
-            return roleStore.objects[result];
+            return (T) data.objects[result];
         }
     }
 
@@ -84,7 +83,7 @@ public class RoleStore implements Store {
      */
     @Override
     public String toString() {
-        Helper<Role> helpUser = new Helper<>();
-        return helpUser.toString(roleStore);
+        Helper<T> helpUser = new Helper<>();
+        return helpUser.toString(data);
     }
 }

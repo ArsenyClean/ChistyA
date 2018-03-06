@@ -1,19 +1,18 @@
-package ru.job4j.service;
+package ru.job4j.store;
 
 /**
  * UserStore яляется хранилищем для элементов типа User
  * @author Chisty Arseny
  * @since 28.02.2018
  */
-public class UserStore implements Store {
+public class UserStore<T extends Base> implements Store<T> {
 
-    private SimpleArray<User> userStore;
-
+    private SimpleArray<T> data;
     /**
      * Конструктор с инициализацией хрнилища
      */
     public UserStore(int size) {
-        userStore = new SimpleArray<>(size);
+        data = new SimpleArray<>(size);
     }
 
     /**
@@ -21,8 +20,8 @@ public class UserStore implements Store {
      * @param model добавляемый элемент
      */
     @Override
-    public void add(Base model) {
-        userStore.add((User) model);
+    public void add(T model) {
+        data.add(model);
     }
 
     /**
@@ -33,12 +32,12 @@ public class UserStore implements Store {
      */
     @Override
     public boolean replace(String id, Base model) {
-        Helper<User> helpUser = new Helper<>();
-        int result = helpUser.searcher(userStore, id);
+        Helper<T> helpUser = new Helper<>();
+        int result = helpUser.searcher(data, id);
         if (result < 0) {
             return false;
         } else {
-            userStore.objects[result] = model;
+            data.objects[result] = model;
             return true;
         }
     }
@@ -50,13 +49,13 @@ public class UserStore implements Store {
      */
     @Override
     public boolean delete(String id) {
-        Helper<User> helpUser = new Helper<>();
-        int result = helpUser.searcher(userStore, id);
+        Helper<T> helpUser = new Helper<>();
+        int result = helpUser.searcher(data, id);
         if (result < 0) {
             return false;
         } else {
-            boolean resultShift = helpUser.shifter(userStore, result);
-            userStore.index--;
+            boolean resultShift = helpUser.shifter(data, result);
+            data.index--;
             return resultShift;
         }
     }
@@ -67,13 +66,13 @@ public class UserStore implements Store {
      * @return null если элемент не нйден, Base если элемент найден
      */
     @Override
-    public Base findById(String id) {
-        Helper<User> helpUser = new Helper<>();
-        int result = helpUser.searcher(userStore, id);
+    public T findById(String id) {
+        Helper<T> helpUser = new Helper<>();
+        int result = helpUser.searcher(data, id);
         if (result < 0) {
             return null;
         } else {
-            return userStore.objects[result];
+            return (T) data.objects[result];
         }
     }
     /**
@@ -82,7 +81,7 @@ public class UserStore implements Store {
      */
     @Override
     public String toString() {
-        Helper<User> helpUser = new Helper<>();
-        return helpUser.toString(userStore);
+        Helper<T> helpUser = new Helper<>();
+        return helpUser.toString(data);
     }
 }

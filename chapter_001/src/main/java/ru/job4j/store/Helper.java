@@ -1,4 +1,4 @@
-package ru.job4j.service;
+package ru.job4j.store;
 
 /**
  * Helper class реализует методы с одинаковым функционалом для UserStore и RoleStore.
@@ -7,7 +7,6 @@ package ru.job4j.service;
  * @param <T> может быть User или Role
  */
 class Helper<T extends Base> {
-
 
     /**
      * seracher проводит поиск запрашиваемого элемента
