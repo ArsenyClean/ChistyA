@@ -1,15 +1,18 @@
 package ru.job4j.cup;
 
+/**
+ * Абстрактный класс для заявок
+ */
 public abstract class Form {
 
-    private final int id;
-    private final String book;
-    private final int type;
-    private final int action;
-    private final int price;
-    private final int value;
+    public  int id;
+    public  String book;
+    public  int type;
+    public  int action;
+    public  int price;
+    public  int value;
 
-    Form(final int id, final String book, final int type,final int action, final int price, final int value) {
+    Form(final int id, final String book, final int type, final int action, final int price, final int value) {
         this.id = id;
         this.book = book;
         this.type = type;
