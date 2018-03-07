@@ -2,32 +2,31 @@ package ru.job4j.cup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
 
 /**
  * Класс реализующий систему трейдинга
- * @param <E> принимает только параметры заявок(Request), унаследованных от абстрактного класса (Форма - Form)
+ * @param <E> принимает только параметры заявок(Request), унаследованных от абстрактного класса Форма (Form)
  * Реализует интерфейс System
  * @author Chisty Arseny
  * @since 7.3.2018
  */
-public class TraidSystem<E extends Form> implements System<E> {
-    List<Cup<E>> cups;
+public class TraidSystem<E extends Form> implements System {
+    private List<Cup<E>> cups;
 
     public TraidSystem() {
-        cups = new ArrayList<Cup<E>>();
+        cups = new ArrayList<>();
     }
 
     /**
      * Метод проверяет, есть ли в системе заявки с таким же Id
-     * @param id
-     * @return
+     * @param id id
+     * @return выполнена операция или нет
      */
     private Boolean checkForId(int id) {
         Boolean isFind = false;
         for (Cup<E> cup : cups) {
             for (E request : cup.sells) {
-                if (request.getId() == id) {
+                if (request.id == id) {
                     isFind = true;
                     break;
                 }
@@ -38,7 +37,7 @@ public class TraidSystem<E extends Form> implements System<E> {
         }
         for (Cup<E> cup : cups) {
             for (E request : cup.buys) {
-                if (request.getId() == id) {
+                if (request.id == id) {
                     isFind = true;
                     break;
                 }
@@ -55,11 +54,11 @@ public class TraidSystem<E extends Form> implements System<E> {
      * @param book имя эммицента
      * @return возвращает ссылку на него
      */
-    private Cup searchBook(String book) {
+    private Cup<E> searchBook(String book) {
         Cup<E> cupResult = null;
         for (Cup<E> cup : cups) {
             for (E el : cup.buys) {
-                if (book.equals(el.getBook())) {
+                if (book.equals(el.book)) {
                     cupResult = cup;
                     return cupResult;
                 }
@@ -67,7 +66,7 @@ public class TraidSystem<E extends Form> implements System<E> {
         }
         for (Cup<E> cup : cups) {
             for (E el : cup.sells) {
-                if (book.equals(el.getBook())) {
+                if (book.equals(el.book)) {
                     cupResult = cup;
                     return cupResult;
                 }
@@ -88,35 +87,30 @@ public class TraidSystem<E extends Form> implements System<E> {
      */
     @Override
     public boolean add(int id, String book, int action, int price, int value) {
-        Boolean idFlag = checkForId(id);
-        /**
-         проверяем, есть ли уже заявка с таким номером,
-         если есть, то мы не можем изменить ее,
-         так как каждый номер - уникален
-         */
-        if (!idFlag) {
+        Boolean idIsFound = checkForId(id);
+        if (!idIsFound) {
             Cup cup = searchBook(book); //Если стакана с таким эммитентом не найдено, то добавляем стакан с ним
             if (cup == null) {
                 cup = new Cup(book);
                 Request request = new Request(id, book, 1, action, price, value);
-                if (request.getAction() <= 0) {
-                    cup.bid((E) request, book);
+                if (request.action <= 0) {
+                    cup.bid(request, book);
                 } else {
-                    cup.ask((E) request, book);
+                    cup.ask(request, book);
                 }
                 cups.add(cup);
-                idFlag = true;
+                idIsFound = true;
             } else {
                 Request request = new Request(id, book, 1, action, price, value);
-                if (request.getAction() <= 0) {
-                    cup.bid((E) request, book);
+                if (request.action <= 0) {
+                    cup.bid(request, book);
                 } else {
-                    cup.ask((E) request, book);
+                    cup.ask(request, book);
                 }
-                idFlag = true;
+                idIsFound = true;
             }
         }
-        return idFlag;
+        return idIsFound;
     }
 
     /**

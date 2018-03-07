@@ -21,36 +21,15 @@ public class Cup<E extends Form>  {
     }
 
     public void bid(E request, String book) {
-//        int flagIsDone = 1;
         this.book = book;
         buys.add(request);
         sorting();
-//        for (E buffRequest : sells) {
-//            if (request != null) {
-//                if (request.getPrice() >= buffRequest.getPrice()) {
-//                    flagIsDone = scaner(request, buffRequest, buys, sells);
-//                }
-//            }
-//        }
-//        if (flagIsDone > 0) {
-//            buys.add(request);
-//        }
-//        buys.sort(
-//                new Comparator<E>() {
-//                    @Override
-//                    public int compare(E o1, E o2) {
-//                        Integer oo1 = o1.getPrice();
-//                        Integer oo2 = o2.getPrice();
-//                        return oo1.compareTo(oo2);
-//                    }
-//                }
-//        );
     }
 
     /**
      * Метод продать ценную бумагу
-     * @param request
-     * @param book
+     * @param request присылаем заявку с нашими данными
+     * @param book а также название эммитента
      */
     public void ask(E request, String book) {
         this.book = book;
@@ -111,8 +90,8 @@ public class Cup<E extends Form>  {
                 new Comparator<E>() {
                     @Override
                     public int compare(E o1, E o2) {
-                        Integer oo1 = o1.getPrice();
-                        Integer oo2 = o2.getPrice();
+                        Integer oo1 = o1.price;
+                        Integer oo2 = o2.price;
                         return oo1.compareTo(oo2);
                     }
                 }
@@ -124,14 +103,14 @@ public class Cup<E extends Form>  {
      * @param join принимает списо либо на продажу либо на покупку
      * @return отсортированный список
      */
-    public List<E> joiner(List<E> join) {
+    private List<E> joiner(List<E> join) {
         List<E> elements = new ArrayList<>();
         for (E data : join) {
             boolean isFind = false;
-            Request request = new Request(data.getId(), data.getBook(), data.isType(),
-                    data.getAction(), data.getPrice(), data.getValue());
+            Request request = new Request(data.id, data.book, data.type,
+                    data.action, data.price, data.value);
             for (E dataRequest : elements) {
-                if (data.getPrice() == dataRequest.getPrice()) {
+                if (data.price == dataRequest.price) {
                     dataRequest.value += data.value;
                     isFind = true;
                 }
@@ -150,10 +129,10 @@ public class Cup<E extends Form>  {
         List<E> buysJoin = joiner(buys);
         StringBuilder stringBuilder = new StringBuilder();
         for (E sellData : sellsJoin) {
-            stringBuilder.append("  " + sellData.getValue() + "      " + sellData.getPrice() + "      ");
+            stringBuilder.append("  " + sellData.value + "      " + sellData.price + "      ");
             for (E buysData : buysJoin) {
-                if (sellData.getPrice() == buysData.getPrice()) {
-                    stringBuilder.append(buysData.getValue());
+                if (sellData.price == buysData.price) {
+                    stringBuilder.append(buysData.value);
                     buysData.type = 0;
                 }
             }
@@ -161,7 +140,7 @@ public class Cup<E extends Form>  {
         }
         for (E buysData : buysJoin) {
             if (buysData.type != 0) {
-                stringBuilder.append("          " + buysData.getPrice() + "     " + buysData.getValue());
+                stringBuilder.append("          " + buysData.price + "     " + buysData.value);
                 stringBuilder.append("\n");
             }
         }

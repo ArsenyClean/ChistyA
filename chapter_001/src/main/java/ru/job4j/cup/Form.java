@@ -20,28 +20,4 @@ public abstract class Form {
         this.price = price;
         this.value = value;
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getBook() {
-        return book;
-    }
-
-    public int isType() {
-        return type;
-    }
-
-    public int getAction() {
-        return action;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public int getValue() {
-        return value;
-    }
 }

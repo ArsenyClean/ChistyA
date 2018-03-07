@@ -7,6 +7,7 @@ import java.io.IOException;
 
 public class CupTest {
 
+
     @Test
     public void test() throws IOException {
         TraidSystem traidSystem = new TraidSystem();
