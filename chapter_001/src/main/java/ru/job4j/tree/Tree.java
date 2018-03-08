@@ -21,12 +21,15 @@ public class Tree<E extends Comparable<E>> implements SimpleTree<E> {
     }
 
     private boolean findChild(Node<E> node, E child) {
+        boolean result = false;
         for (Node<E> leave : node.leaves()) {
-            if (leave.eqValue(child)) {
-                return true;
+            if (!result) {
+                if (leave.eqValue(child)) {
+                    result = true;
+                }
             }
         }
-        return false;
+        return result;
     }
 
     public boolean isBynry() {
@@ -51,17 +54,22 @@ public class Tree<E extends Comparable<E>> implements SimpleTree<E> {
 
     @Override
     public boolean add(E parent, E child) {
+        boolean flag = true;
         Optional<Node<E>> result = findBy(parent);
         if (!result.isPresent()) {
-            return false;
+            flag = false;
         }
-        Node<E> node = result.get();
-        if (findChild(node, child)) {
-            return false;
+        if (flag) {
+            Node<E> node = result.get();
+            if (findChild(node, child)) {
+                flag = false;
+            }
+            if (flag) {
+                node.add(new Node(child));
+                modCount++;
+            }
         }
-        node.add(new Node(child));
-        modCount++;
-        return true;
+        return flag;
     }
 
     @Override
