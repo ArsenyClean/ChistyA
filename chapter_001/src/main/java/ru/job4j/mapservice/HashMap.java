@@ -37,17 +37,20 @@ public class HashMap<K, V> implements Iterable<V> {
     }
 
     public boolean insert(K key, V value) {
+        boolean result = true;
         int hash = hashMake(key);
         int position = indexMake(hash, array.length);
         if (!checkForExist(position)) {
-            return false;
+            result = false;
         }
-        modCount++;
-        full++;
-        KeyValue<K, V> newKeyValue = new KeyValue<K, V>(key, value);
-        array[position] = newKeyValue;
-        checkFull();
-        return true;
+        if (result) {
+            modCount++;
+            full++;
+            KeyValue<K, V> newKeyValue = new KeyValue<K, V>(key, value);
+            array[position] = newKeyValue;
+            checkFull();
+        }
+        return result;
     }
 
     private void checkFull() {
@@ -60,22 +63,22 @@ public class HashMap<K, V> implements Iterable<V> {
     public V get(K key) {
         int hash = hashMake(key);
         int position = indexMake(hash, array.length);
-        if (!checkForExist(position)) {
-            return null;
-        }
-        return (V) array[position].value;
+        return (!checkForExist(position)) ? null : (V) array[position].value;
     }
 
     public boolean delete(K key) {
+        boolean result = true;
         int hash = hashMake(key);
         int position = indexMake(hash, array.length);
         if (checkForExist(position)) {
-            return false;
+            result = false;
         }
-        modCount++;
-        full--;
-        array[position] = null;
-        return true;
+        if (result) {
+            modCount++;
+            full--;
+            array[position] = null;
+        }
+        return result;
     }
 
     private KeyValue<K, V>[] growTable() {
