@@ -5,6 +5,7 @@ import ru.job4j.lists.SimpleContainer;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class DynamicContainer<E> implements SimpleContainer, Iterable {
 
@@ -22,16 +23,16 @@ public class DynamicContainer<E> implements SimpleContainer, Iterable {
         return copyContainer;
     }
 
+    public void ensureCapacity() {
+        if (this.container.length <= index) {
+            this.container = increaseContain(this.container);
+        }
+    }
+
     @Override
     public void add(Object value) {
-        if (this.container.length > index) {
-            this.container[index] = value;
-            index++;
-        } else {
-            this.container = increaseContain(this.container);
-            this.container[index] = value;
-            index++;
-        }
+        ensureCapacity();
+        this.container[index++] = value;
         modCount++;
     }
 
@@ -48,18 +49,19 @@ public class DynamicContainer<E> implements SimpleContainer, Iterable {
             @Override
             public boolean hasNext() {
                 modCheck();
-                return container.length > iteratorIndex;
+                return container.length > index;
             }
 
             @Override
             public Object next() {
-                hasNext();
-                iteratorIndex++;
-                return container[iteratorIndex - 1];
+                if (hasNext()) {
+                    return container[iteratorIndex++];
+                }
+                throw new NoSuchElementException();
             }
 
             private void  modCheck() {
-                if (expectedModCount == modCount) {
+                if (expectedModCount    != modCount) {
                     throw new ConcurrentModificationException();
                 }
             }
