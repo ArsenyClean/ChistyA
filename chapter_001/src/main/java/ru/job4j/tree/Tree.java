@@ -32,18 +32,21 @@ public class Tree<E extends Comparable<E>> implements SimpleTree<E> {
     public boolean isBynry() {
         Queue<Node<E>> queue = new LinkedList<>();
         queue.offer(this.root);
+        boolean result = true;
         while (!queue.isEmpty()) {
-            Node<E> node = queue.poll();
-            int counter = 0;
-            for (Node<E> leave : node.leaves()) {
-                queue.offer(leave);
-                counter++;
-            }
-            if (counter > 2) {
-                return false;
+            if (result) {
+                Node<E> node = queue.poll();
+                int counter = 0;
+                for (Node<E> leave : node.leaves()) {
+                    queue.offer(leave);
+                    counter++;
+                }
+                if (counter > 2) {
+                    result = false;
+                }
             }
         }
-        return true;
+        return result;
     }
 
     @Override
