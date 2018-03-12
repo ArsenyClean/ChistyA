@@ -10,14 +10,18 @@ public class Time implements Runnable {
         this.string = string;
     }
 
-    @Override
-    public void run() {
+    private void counter() {
         long flag = 0;
         long currentT = System.currentTimeMillis();
         while (flag < finishTime) {
             flag = System.currentTimeMillis() - currentT;
         }
         System.out.println("Время выполнения кончилось" );
+    }
+
+    @Override
+    public void run() {
+        counter();
         Thread.currentThread().interrupt();
     }
 }
