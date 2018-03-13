@@ -16,7 +16,7 @@ public class Time implements Runnable {
         while (flag < finishTime) {
             flag = System.currentTimeMillis() - currentT;
         }
-        System.out.println("Время выполнения кончилось" );
+        System.out.println("Время выполнения кончилось");
     }
 
     @Override
