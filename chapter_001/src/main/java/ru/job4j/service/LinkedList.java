@@ -1,5 +1,8 @@
 package ru.job4j.service;
 
+import net.jcip.annotations.GuardedBy;
+import net.jcip.annotations.ThreadSafe;
+
 import java.util.*;
 
 /**
@@ -7,11 +10,16 @@ import java.util.*;
  * @author Chisty Arseny
  * @since 16.02.2018
  */
+@ThreadSafe
 public class LinkedList<E> implements SimpleContainer<E>, Iterable<E> {
-    public Node<E> first;
+
+    @GuardedBy("this")
+    Node<E> first;
 
     public LinkedList() {
-        first = new Node<E>();
+        synchronized (this) {
+            first = new Node<E>();
+        }
     }
 
     private int modCount = 0;
@@ -23,69 +31,81 @@ public class LinkedList<E> implements SimpleContainer<E>, Iterable<E> {
         E value;
 
         public Node() {
-            this.next = null;
-            this.value = null;
-            this.prev = null;
+            synchronized (this) {
+                this.next = null;
+                this.value = null;
+                this.prev = null;
+            }
         }
 
         public Node(E value) {
-            this.value = value;
-            this.prev = null;
-            this.next = null;
+            synchronized (this) {
+                this.value = value;
+                this.prev = null;
+                this.next = null;
+            }
         }
     }
 
     boolean hasCycle() {
-        Node rabbit = this.first;
-        Node turrtle = this.first;
-        while (rabbit.next != null) {
-            rabbit = rabbit.next.next;
-            turrtle = turrtle.next;
-            if (rabbit == turrtle) {
-                return true;
+        synchronized (this) {
+            Node rabbit = this.first;
+            Node turrtle = this.first;
+            while (rabbit.next != null) {
+                rabbit = rabbit.next.next;
+                turrtle = turrtle.next;
+                if (rabbit == turrtle) {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         int i = 0;
-        Node copyNode = first;
-        while (copyNode.next != null) {
-            String string = "[" + i + "]=" + copyNode.next.value.toString() + " ";
-            builder.append(string);
-            i++;
-            copyNode = copyNode.next;
+        synchronized (this) {
+            Node copyNode = first;
+            while (copyNode.next != null) {
+                String string = "[" + i + "]=" + copyNode.next.value.toString() + " ";
+                builder.append(string);
+                i++;
+                copyNode = copyNode.next;
+            }
+            return builder.toString();
         }
-        return builder.toString();
     }
 
     @Override
     public void add(E value) {
         Node<E> newNode = new Node<E>(value);
-        Node<E> counterNode = this.first;
-        while (counterNode.next != null) {
-            counterNode = counterNode.next;
+        synchronized (this) {
+            Node<E> counterNode = this.first;
+            while (counterNode.next != null) {
+                counterNode = counterNode.next;
+            }
+            counterNode.next = newNode;
+            newNode.prev = counterNode;
+            modCount++;
         }
-        counterNode.next = newNode;
-        newNode.prev = counterNode;
-        modCount++;
     }
 
     @Override
     public E get(int index) {
-        Node<E> counterNode = this.first;
-        int counter = 0;
-        while (counter < index && counterNode != null) {
-            counterNode = counterNode.next;
-            counter++;
+        synchronized (this) {
+            Node<E> counterNode = this.first;
+            int counter = 0;
+            while (counter < index && counterNode != null) {
+                counterNode = counterNode.next;
+                counter++;
+            }
+            if (counterNode == null) {
+                return null;
+            }
+            return counterNode.value;
         }
-        if (counterNode == null) {
-            return null;
-        }
-        return counterNode.value;
     }
 
     @Override
@@ -96,7 +116,9 @@ public class LinkedList<E> implements SimpleContainer<E>, Iterable<E> {
 
             @Override
             public boolean hasNext() {
-                return currentNode != null;
+                synchronized (this) {
+                    return currentNode != null;
+                }
             }
 
             @Override
@@ -105,14 +127,18 @@ public class LinkedList<E> implements SimpleContainer<E>, Iterable<E> {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                E result = currentNode.value;
-                currentNode = currentNode.next;
-                return result;
+                synchronized (this) {
+                    E result = currentNode.value;
+                    currentNode = currentNode.next;
+                    return result;
+                }
             }
 
             private void checkForCoModification() {
-                if (expectedModCount != modCount) {
-                    throw new ConcurrentModificationException();
+                synchronized (this) {
+                    if (expectedModCount != modCount) {
+                        throw new ConcurrentModificationException();
+                    }
                 }
             }
         };
