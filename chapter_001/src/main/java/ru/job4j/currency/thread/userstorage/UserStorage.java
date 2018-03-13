@@ -1,8 +1,11 @@
 package ru.job4j.currency.thread.userstorage;
 
+import net.jcip.annotations.ThreadSafe;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@ThreadSafe
 public class UserStorage {
 
     private List<User> list = new ArrayList<>();
@@ -68,8 +71,8 @@ public class UserStorage {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < list.size(); i++) {
-            stringBuilder.append("[").append(list.get(i).getId()).append("]=").append(list.get(i).getAmount()).append(" ");
+        for (User user : list) {
+            stringBuilder.append("[").append(user.getId()).append("]=").append(user.getAmount()).append(" ");
         }
         stringBuilder.append("\n");
         return stringBuilder.toString();
