@@ -15,14 +15,13 @@ public class LinkedList<E> implements SimpleContainer<E>, Iterable<E> {
 
     @GuardedBy("this")
     Node<E> first;
+    private int modCount = 0;
 
     public LinkedList() {
         synchronized (this) {
             first = new Node<E>();
         }
     }
-
-    private int modCount = 0;
 
     public static class Node<E> {
 
