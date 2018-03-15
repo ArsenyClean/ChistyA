@@ -1,8 +1,9 @@
 package ru.job4j.service;
 
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import javafx.scene.effect.SepiaTone;
+
+import java.util.*;
+import java.util.HashSet;
 
 public class SimpleLinkedSet<E> implements Iterable<E> {
 
@@ -14,6 +15,7 @@ public class SimpleLinkedSet<E> implements Iterable<E> {
         list.add(value);
     }
     public SimpleLinkedSet() { }
+
 
     public void add(E value) {
         LinkedList.Node copyNode = list.first;

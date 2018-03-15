@@ -1,0 +1,22 @@
+41214
+324132
+3415345
+323464
+464355
+34243
+
+
+        try {
+            String fileWay = "C://projects//ChistyA//chapter_001//src//main//java//ru//job4j//cup//keys.txt";
+            BufferedReader fileReader = new BufferedReader(new FileReader(fileWay));
+            String string = new String();
+            while ((string = fileReader.readLine()) != null) {
+                Integer id = Integer.parseInt(string);
+                int i  = id;
+                System.out.println(string + " " + i);
+            }
+            System.out.println(fileReader.readLine());
+        } catch (FileNotFoundException e) {
+            System.out.println("Файл не найден");
+        }
+        return true;
