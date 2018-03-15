@@ -27,14 +27,15 @@ public class SimpleBlockingQueue<T> {
         synchronized (this) {
             while (index > indexLimit) {
                 try {
-                    wait();
+                    System.out.println("Waiting offer");
+                    this.wait();
                 } catch (InterruptedException e) {
-                    return;
+                    e.printStackTrace();
                 }
             }
             queue.add(value);
             index++;
-            notify();
+            this.notify();
         }
     }
 
@@ -42,14 +43,15 @@ public class SimpleBlockingQueue<T> {
         synchronized (this) {
             while (index < 1) {
                 try {
-                    wait();
+                    System.out.println("Waiting peek");
+                    this.wait();
                 } catch (InterruptedException e) {
                     return null;
                 }
             }
             T result = queue.poll();
             index--;
-            notify();
+            this.notify();
             return result;
         }
     }
