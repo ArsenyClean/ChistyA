@@ -1,6 +1,7 @@
 package ru.job4j.servic;
 
 import org.junit.Test;
+import ru.job4j.currency.thread.bomber.BomberMan;
 import ru.job4j.currency.thread.nonblockcash.Model;
 import ru.job4j.currency.thread.nonblockcash.NonBlockCash;
 import ru.job4j.currency.thread.onsumerproducer.Consumer;
@@ -66,10 +67,12 @@ public class SimpleBlockQueueTest {
 
     @Test
     public void testOf() {
-        Random random= new Random();
-        for (int i = 0; i < 10; i++) {
-            System.out.println(1 + random.nextInt(4));
-        }
+//        Random random= new Random();
+//        for (int i = 0; i < 10; i++) {
+//            System.out.println(1 + random.nextInt(4));
+//        }
+        BomberMan bomberMan = new BomberMan(7, 4);
+        bomberMan.starter();
     }
 //
 //    @Test
