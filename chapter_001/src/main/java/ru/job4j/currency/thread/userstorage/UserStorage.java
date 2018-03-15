@@ -69,7 +69,7 @@ public class UserStorage {
     }
 
     @Override
-    public String toString() {
+    public synchronized String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (User user : list) {
             stringBuilder.append("[").append(user.getId()).append("]=").append(user.getAmount()).append(" ");
