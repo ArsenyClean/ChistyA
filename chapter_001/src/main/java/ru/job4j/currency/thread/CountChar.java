@@ -9,18 +9,15 @@ public class CountChar implements Runnable {
     }
 
     private void doing() throws InterruptedException {
-        while (!Thread.currentThread().isInterrupted()) {
-            char[] chars = string.toCharArray();
-            int counter = 0;
-            for (int i = 0; i < chars.length; i++) {
-                if (Thread.currentThread().isInterrupted()) {
-                    return;
-                }
-                counter++;
+        char[] chars = string.toCharArray();
+        int counter = 0;
+        for (int i = 0; i < chars.length; i++) {
+            if (Thread.currentThread().isInterrupted()) {
+                return;
             }
-            System.out.println("Количество символов: " + counter);
-            Thread.currentThread().interrupt();
+            counter++;
         }
+        System.out.println("Количество символов: " + counter);
     }
 
     @Override

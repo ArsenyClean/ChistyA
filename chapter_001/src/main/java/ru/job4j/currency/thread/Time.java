@@ -11,10 +11,10 @@ public class Time implements Runnable {
     }
 
     private void counter() {
-        long flag = 0;
-        long currentT = System.currentTimeMillis();
-        while (flag < finishTime) {
-            flag = System.currentTimeMillis() - currentT;
+        try {
+            Thread.sleep(finishTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         System.out.println("Время выполнения кончилось");
     }
@@ -22,6 +22,5 @@ public class Time implements Runnable {
     @Override
     public void run() {
         counter();
-        Thread.currentThread().interrupt();
     }
 }

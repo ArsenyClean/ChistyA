@@ -9,9 +9,7 @@ public class Main {
         Thread thread2 = new Thread(new CountChar(string));
         thread1.start();
         thread2.start();
-        while (!thread1.isInterrupted()) {
-            int t;
-        }
+        thread1.join();
         thread2.interrupt();
         thread2.join();
     }
