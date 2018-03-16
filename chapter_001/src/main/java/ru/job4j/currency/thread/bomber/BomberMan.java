@@ -6,10 +6,21 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class BomberMan {
 
+    public class BomberReentrantLock {
+
+        String name;
+        ReentrantLock lock;
+
+        public BomberReentrantLock(String name) {
+            this.name = name;
+            lock = new ReentrantLock();
+        }
+    }
+
     public class Hero {
         private int placeLength;
         private int placeHigth;
-        private final int id;
+        private String name;
 
         private int getLength() {
             return placeLength;
@@ -19,27 +30,24 @@ public class BomberMan {
             return placeHigth;
         }
 
-        private int getId() {
-            return this.id;
+        private String getName() {
+            return this.name;
         }
 
-        public Hero(int boardLength, int boardHight, int id) {
-            this.id = id;
-            generatePlace(boardLength, boardHight);
+        public Hero(int boardLength, int boardHight, String name) {
+            this.name = name;
             boolean lockIsDone = false;
             while (!lockIsDone) {
                 try {
-                    if (board[placeLength][placeHigth].tryLock(500, TimeUnit.MILLISECONDS)) {
+                    generatePlace(boardLength, boardHight);
+                    if (board[placeLength][placeHigth].lock.tryLock(500, TimeUnit.MILLISECONDS)) {
                         lockIsDone = true;
+                        board[placeLength][placeHigth].name = name;
                         break;
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                generatePlace(boardLength, boardHight);
-            }
-            synchronized (mapMassive) {
-                mapMassive[placeLength][placeHigth] = id;
             }
         }
 
@@ -57,43 +65,56 @@ public class BomberMan {
         }
     }
 
-    private final ReentrantLock[][] board;
-    private volatile Integer[][] mapMassive;
+    private final BomberReentrantLock[][] board;
     private final int bHigth;
     private final int bLength;
 
-    public BomberMan(final int length, final int higth) {
-        bLength = length;
-        bHigth = higth;
-        board = new ReentrantLock[bLength][bHigth];
-        mapMassive = new Integer[bLength][bHigth];
+    public BomberMan(final int lengthOrIfRandomItIsMin, final int higthOrIfRandomItIsMax, boolean randomMap) {
+        if (!randomMap) {
+            bLength = lengthOrIfRandomItIsMin;
+            bHigth = higthOrIfRandomItIsMax;
+        } else {
+            bLength = generateMapeSizes(lengthOrIfRandomItIsMin, higthOrIfRandomItIsMax);
+            bHigth = generateMapeSizes(lengthOrIfRandomItIsMin, higthOrIfRandomItIsMax);
+        }
+        board = new BomberReentrantLock[bLength][bHigth];
         for (int i = 0; i < bLength; i++) {
             for (int j = 0; j < bHigth; j++) {
-                board[i][j] = new ReentrantLock();
-                mapMassive[i][j] = 0;
+                board[i][j] = new BomberReentrantLock(" ");
             }
         }
     }
 
-    private void moveHero(Hero hero) {
+    /**
+     *
+     * @param hero герой для перемещения
+     * @param howMuchThinkToGo время на попытку залочиться
+     * @param walkFromConsole если ввод через консоль, то устанавливаем true
+     * @param whereToWalk если ввод консольный, то мы задаем движение через эту переменную
+     *                    (1 - наверх, 2 - налево, 3 - вниз, 4 - вправо)
+     */
+    private void moveHero(Hero hero, long howMuchThinkToGo, boolean walkFromConsole, int whereToWalk) {
         boolean moveIsDone = false;
         int previousPlace = 0;
         while (!moveIsDone) {
-            Random randomPlace = new Random();
-            int newPlace = 1 + randomPlace.nextInt(4); //Рандомно ступаем героем(1 - влево, 2 - наверх, 3 - вправо, 4 - вниз)
-            while (newPlace == previousPlace) { //Проверяем, пытались ли мы пойти в эту сторону в прошлый раз
-                newPlace = 1 + randomPlace.nextInt(4);
+            int newPlace;
+            if (!walkFromConsole) {
+                Random randomPlace = new Random();
+                newPlace = 1 + randomPlace.nextInt(4); //Рандомно ступаем героем
+                while (newPlace == previousPlace) { //Проверяем, пытались ли мы пойти в эту сторону в прошлый раз
+                    newPlace = 1 + randomPlace.nextInt(4);
+                }
+                previousPlace = newPlace;
+            } else {
+                newPlace = whereToWalk;
             }
-            previousPlace = newPlace;
-            if (newPlace == 1) {     //1 - значит движение влево
+            if (newPlace == 1) {
                 if (hero.getLength() > 0) { //Если это не крайняя левая позиция на карте
                     try {
-                        if (board[hero.getLength() - 1][hero.getHigth()].tryLock(500, TimeUnit.MILLISECONDS)) {
-                            board[hero.getLength()][hero.getHigth()].unlock();
-                            synchronized (this) {
-                                mapMassive[hero.getLength() - 1][hero.getHigth()] = hero.getId();
-                                mapMassive[hero.getLength()][hero.getHigth()] = 0;
-                            }
+                        if (board[hero.getLength() - 1][hero.getHigth()].lock.tryLock(howMuchThinkToGo, TimeUnit.MILLISECONDS)) {
+                            board[hero.getLength() - 1][hero.getHigth()].name = hero.getName();
+                            board[hero.getLength()][hero.getHigth()].name = " ";
+                            board[hero.getLength()][hero.getHigth()].lock.unlock();
                             hero.setPlaceOfHero(hero.getLength() - 1, hero.getHigth());
                             moveIsDone = true;
                         }
@@ -102,15 +123,13 @@ public class BomberMan {
                     }
                 }
             }
-            if (newPlace == 2) { //2 - значит движение наверх
+            if (newPlace == 2) {
                 if (hero.getHigth() > 0) { //Если это не крайняя верхняя точка
                     try {
-                        if (board[hero.getLength()][hero.getHigth() - 1].tryLock(500, TimeUnit.MILLISECONDS)) {
-                            board[hero.getLength()][hero.getHigth()].unlock();
-                            synchronized (this) {
-                                mapMassive[hero.getLength()][hero.getHigth() - 1] = hero.getId();
-                                mapMassive[hero.getLength()][hero.getHigth()] = 0;
-                            }
+                        if (board[hero.getLength()][hero.getHigth() - 1].lock.tryLock(howMuchThinkToGo, TimeUnit.MILLISECONDS)) {
+                            board[hero.getLength()][hero.getHigth() - 1].name = hero.getName();
+                            board[hero.getLength()][hero.getHigth()].name = " ";
+                            board[hero.getLength()][hero.getHigth()].lock.unlock();
                             hero.setPlaceOfHero(hero.getLength(), hero.getHigth() - 1);
                             moveIsDone = true;
                         }
@@ -120,14 +139,12 @@ public class BomberMan {
                 }
             }
             if (newPlace == 3) {
-                if (hero.getLength() < bLength - 2) {
+                if (hero.getLength() < bLength - 1) {
                     try {
-                        if (board[hero.getLength() + 1][hero.getHigth()].tryLock(500, TimeUnit.MILLISECONDS)) {
-                            board[hero.getLength()][hero.getHigth()].unlock();
-                            synchronized (this) {
-                                mapMassive[hero.getLength() + 1][hero.getHigth()] = hero.getId();
-                                mapMassive[hero.getLength()][hero.getHigth()] = 0;
-                            }
+                        if (board[hero.getLength() + 1][hero.getHigth()].lock.tryLock(howMuchThinkToGo, TimeUnit.MILLISECONDS)) {
+                            board[hero.getLength() + 1][hero.getHigth()].name = hero.getName();
+                            board[hero.getLength()][hero.getHigth()].name = " ";
+                            board[hero.getLength()][hero.getHigth()].lock.unlock();
                             hero.setPlaceOfHero(hero.getLength() + 1, hero.getHigth());
                             moveIsDone = true;
                         }
@@ -137,14 +154,12 @@ public class BomberMan {
                 }
             }
             if (newPlace == 4) {
-                if (hero.getHigth() < bHigth - 2) {
+                if (hero.getHigth() < bHigth - 1) {
                     try {
-                        if (board[hero.getLength()][hero.getHigth() + 1].tryLock(500, TimeUnit.MILLISECONDS)) {
-                            board[hero.getLength()][hero.getHigth()].unlock();
-                            synchronized (this) {
-                                mapMassive[hero.getLength()][hero.getHigth() + 1] = hero.getId();
-                                mapMassive[hero.getLength()][hero.getHigth()] = 0;
-                            }
+                        if (board[hero.getLength()][hero.getHigth() + 1].lock.tryLock(howMuchThinkToGo, TimeUnit.MILLISECONDS)) {
+                            board[hero.getLength()][hero.getHigth() + 1].name = hero.getName();
+                            board[hero.getLength()][hero.getHigth()].name = " ";
+                            board[hero.getLength()][hero.getHigth()].lock.unlock();
                             hero.setPlaceOfHero(hero.getLength(), hero.getHigth() + 1);
                             moveIsDone = true;
                         }
@@ -154,6 +169,17 @@ public class BomberMan {
                 }
             }
         }
+    }
+
+    private int generateMapeSizes(int min, int max) {
+        Random random = new Random();
+        if (min > max) {
+            int buf = min;
+            min = max;
+            max = buf;
+        }
+        int result = min + random.nextInt(max - min);
+        return result;
     }
 
     public String printMap() {
@@ -167,8 +193,8 @@ public class BomberMan {
             for (int i = 0; i < bLength; i++) {
                 stringBuilder.append("|");
                 for (int j = 0; j < bHigth; j++) {
-                    if (mapMassive[i][j] > 0) {
-                        stringBuilder.append(mapMassive[i][j]);
+                    if (board[i][j].lock.isLocked()) {
+                        stringBuilder.append(board[i][j].name);
                     } else {
                         stringBuilder.append(" ");
                     }
@@ -186,16 +212,50 @@ public class BomberMan {
         return stringBuilder.toString();
     }
 
-    public void starter() {
+    public void starter(int numberOfStones, int numberOfMonsters) {
+        Thread stonesThread = new Thread() {
+            @Override
+            public void run() {
+                Hero[] stones = new Hero[numberOfStones];
+                for (int i = 0; i < numberOfStones; i++) {
+                    stones[i] = new Hero(bLength, bHigth, "O"); //Name для препятствий O
+                }
+            }
+        };
+        stonesThread.start(); //Генрируем камни
+        try {
+            stonesThread.join(); // Ждем генерации
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Thread heroThread = new Thread() {
             @Override
             public void run() {
-                Hero hero = new Hero(bLength, bHigth, 1); //id для бомбермена только 1
+                Hero hero = new Hero(bLength, bHigth, "1"); //Name для бомбермена 1
                 for (int i = 0; i < 20; i++) {
-                    moveHero(hero);
+                    moveHero(hero, 500, false, 3);
                     try {
                         Thread.sleep(1000);
                         System.out.println(printMap());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        Thread monstersThread = new Thread() {
+            @Override
+            public void run() {
+                Hero[] monsters = new Hero[numberOfMonsters];
+                for (int i = 0; i < numberOfMonsters; i++) {
+                    monsters[i] = new Hero(bLength, bHigth, "M"); //Name для монстров M
+                }
+                while (!Thread.currentThread().isInterrupted()) {
+                    for (int i = 0; i < numberOfMonsters; i++) {
+                        moveHero(monsters[i], 5000, false, 1);
+                    }
+                    try {
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -208,19 +268,20 @@ public class BomberMan {
                 while (!Thread.currentThread().isInterrupted()) {
                     printMap();
                     try {
-                        Thread.sleep(1000);
-                        System.out.println(printMap());
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         System.out.println();
                     }
                 }
             }
         };
+        monstersThread.start();
         mapShow.start();
         heroThread.start();
         try {
             heroThread.join();
             mapShow.interrupt();
+            monstersThread.interrupt();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
