@@ -5,7 +5,6 @@ import ru.job4j.sql.JavaBeanDemo;
 
 public class JDBCTest {
 
-
     @Test
     public void testJDBC() {
         String url = "jdbc:postgresql://localhost:5432/userstore";
@@ -14,5 +13,4 @@ public class JDBCTest {
         JavaBeanDemo jdSql = new JavaBeanDemo(url, username, password, 100);
         jdSql.starter();
     }
-
 }

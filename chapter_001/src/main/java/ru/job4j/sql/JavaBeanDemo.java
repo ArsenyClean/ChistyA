@@ -1,7 +1,6 @@
 package ru.job4j.sql;
 
 import org.postgresql.util.PSQLState;
-
 import java.io.IOException;
 import java.sql.*;
 import org.slf4j.Logger;

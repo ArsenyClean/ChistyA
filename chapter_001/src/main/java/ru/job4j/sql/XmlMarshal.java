@@ -3,8 +3,6 @@ package ru.job4j.sql;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -15,28 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class XmlMarshal {
-
-    public static class Entry {
-
-        @XmlElement(name = "field")
-        int field;
-
-        public void setField(int field) {
-            this.field = field;
-        }
-    }
-
-    @XmlRootElement(name = "entries")
-    public static class Entries {
-
-        @XmlElement(name = "entry")
-        List<Entry> entries;
-
-        public void setField(List<Entry> entries) {
-            this.entries = entries;
-        }
-    }
-
 
     public void marshalXml(Connection conn) throws IOException {
         try {
