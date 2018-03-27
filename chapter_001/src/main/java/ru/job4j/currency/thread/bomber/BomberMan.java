@@ -6,6 +6,15 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class BomberMan {
 
+    /**
+     * Класс BomberReentrantLock
+     * Данный редставляет собой альтернативу обычному элементу ReentrantLock() массив из которых
+     * предлагалось сделать в условиях заданий
+     * Проблема, которую я хотел решить благодаря этому, это присваивание каждому локу имени
+     * Благодаря этому карта состоит не просто из локов, а каждому из них можно присвоить имя
+     * и так по имени можно определить кто залочил данный элемент из массива  BomberReentrantLock, сам герой
+     * препятствие, или монстр
+     */
     public class BomberReentrantLock {
 
         String name;
@@ -17,6 +26,10 @@ public class BomberMan {
         }
     }
 
+    /**
+     *Класс Hero нужен для залочивания позиции  BomberReentrantLock
+     * Этот класс может реализовывать не только герой, но и монстр и препятствие
+     */
     public class Hero {
         private int placeLength;
         private int placeHigth;
@@ -34,6 +47,14 @@ public class BomberMan {
             return this.name;
         }
 
+        /**
+         * Метод Hero
+         * С ним пытаемся "посадить" героя, монстра или препятствие на карту
+         * Пока не залочится ячейка им, мы будем генерировать рандомные места на карте
+         * @param boardLength длинна карты
+         * @param boardHight  ширина
+         * @param name имя
+         */
         public Hero(int boardLength, int boardHight, String name) {
             this.name = name;
             boolean lockIsDone = false;
@@ -51,6 +72,11 @@ public class BomberMan {
             }
         }
 
+        /**
+         * Метод generatePlace генерирует место на карте для героя, монстра или препятствия
+         * @param boardLength длинна карты
+         * @param boardHight ширина
+         */
         private void generatePlace(int boardLength, int boardHight) {
             Random random = new Random();
             int gener = random.nextInt(boardLength);
@@ -59,6 +85,11 @@ public class BomberMan {
             placeHigth = gener;
         }
 
+        /**
+         * Метод установки координат
+         * @param placeLength
+         * @param placeHigth
+         */
         public void setPlaceOfHero(int placeLength, int placeHigth) {
             this.placeHigth = placeHigth;
             this.placeLength = placeLength;
@@ -69,6 +100,18 @@ public class BomberMan {
     private final int bHigth;
     private final int bLength;
 
+    /**
+     * Конструктор BomberMan
+     * Данный конструктор принимает параметры длинны и ширины BomberReentrantLock
+     * Есть два режима этого конструктора:
+     * 1) Если мы запускаем НЕ рандомную гнерацию карты, в таком случае первые два параметра являются
+     * высотой и шириной карты, которую мы задаем
+     * 2) Если мы запускаем рандомную генерацию карты, и в таком случае первый параметр является
+     * МИНИМАЛЬНОЙ шириной и высотой карты, а второй параметр является МАКСИМАЛЬНОЙ шириной и высотой
+     * @param lengthOrIfRandomItIsMin парметр1
+     * @param higthOrIfRandomItIsMax параметр2
+     * @param randomMap true означает, что работает рандомный режим генерации карты
+     */
     public BomberMan(final int lengthOrIfRandomItIsMin, final int higthOrIfRandomItIsMax, boolean randomMap) {
         if (!randomMap) {
             bLength = lengthOrIfRandomItIsMin;
@@ -86,7 +129,29 @@ public class BomberMan {
     }
 
     /**
-     *
+     * Метод для генерации размеров карты
+     * @param min минимальный
+     * @param max максимальный
+     * @return результат
+     */
+    private int generateMapeSizes(int min, int max) {
+        Random random = new Random();
+        if (min > max) {
+            int buf = min;
+            min = max;
+            max = buf;
+        }
+        int result = min + random.nextInt(max - min);
+        return result;
+    }
+
+    /**
+     * Метод moveHero
+     * Используется для перемещения монстров или героя
+     * Выполняет цикл по условию moveISDone до тех пор пока для данного героя или монстра не найдется свободная ячейка
+     * Вначале цикла, если у нас режим перемещния героя НЕ через консоль, то мы генирируем новое место до тех пор
+     * пока не найдем свободную ячейку, а  если у нас режим перемещения через консоль,
+     * то просто перемещаем героя в данную клетку
      * @param hero герой для перемещения
      * @param howMuchThinkToGo время на попытку залочиться
      * @param walkFromConsole если ввод через консоль, то устанавливаем true
@@ -171,17 +236,10 @@ public class BomberMan {
         }
     }
 
-    private int generateMapeSizes(int min, int max) {
-        Random random = new Random();
-        if (min > max) {
-            int buf = min;
-            min = max;
-            max = buf;
-        }
-        int result = min + random.nextInt(max - min);
-        return result;
-    }
-
+    /**
+     * Метод эквивалентный toString
+     * Выводит карту
+     */
     public String printMap() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("-");
@@ -212,6 +270,14 @@ public class BomberMan {
         return stringBuilder.toString();
     }
 
+    /**
+     * Метод starter
+     * Сначала создает препятствия на карте
+     * Далее генерируем героя и сажаем на карту
+     * Потом монстров
+     * @param numberOfStones
+     * @param numberOfMonsters
+     */
     public void starter(int numberOfStones, int numberOfMonsters) {
         Thread stonesThread = new Thread() {
             @Override
@@ -251,7 +317,7 @@ public class BomberMan {
                     monsters[i] = new Hero(bLength, bHigth, "M"); //Name для монстров M
                 }
                 while (!Thread.currentThread().isInterrupted()) {
-                    for (int i = 0; i < numberOfMonsters; i++) {
+                    for (int i = 0; i < numberOfMonsters; i++) {    //Монстрам даем 5 секунд на раздумие куда пойти
                         moveHero(monsters[i], 5000, false, 1);
                     }
                     try {
