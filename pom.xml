@@ -10,6 +10,13 @@
 
 	 <dependencies>
 		 <dependency>
+			 <groupId>javax.servlet</groupId>
+			 <artifactId>servlet-api</artifactId>
+			 <version>2.5</version>
+			 <scope>provided</scope>
+		 </dependency>
+
+		 <dependency>
 				 <groupId>junit</groupId>
 				 <artifactId>junit</artifactId>
 				 <version>4.12</version>
@@ -92,6 +99,13 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<webXml>src\main\webapp\WEB-INF\web</webXml>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build> 
     <properties>
@@ -101,6 +115,7 @@
      </properties>
 
     <modules>
-       <module>chapter_001</module>
+		<module>chapter_001</module>
+		<module>chapter_009</module>
      </modules>
 </project>
