@@ -6,10 +6,26 @@ import java.util.Date;
 
 public class User {
 
+    private Integer id;
     private String name;
     private String login;
     private String email;
     private String createDate;
+
+    public User(Integer id, String name, String login, String email, String createDate) {
+        this.id = id;
+        this.name = name;
+        this.login = login;
+        this.email = email;
+        this.createDate = createDate;
+    }
+
+    public User(String name, String login, String email, String createDate) {
+        this.name = name;
+        this.login = login;
+        this.email = email;
+        this.createDate = createDate;
+    }
 
     public User(String name, String login, String email) {
         this.name = name;
@@ -18,11 +34,8 @@ public class User {
         this.createDate = new Timestamp(System.currentTimeMillis()).toString();
     }
 
-    public User(String name, String login, String email, String createDate) {
-        this.name = name;
-        this.login = login;
-        this.email = email;
-        this.createDate = createDate;
+    public Integer getId() {
+        return id;
     }
 
     public String getName() {
