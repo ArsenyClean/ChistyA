@@ -11,11 +11,15 @@ public class UserCreateServlet extends HttpServlet {
     private UserStore instance;
 
     @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.getRequestDispatcher("WEB-INF/UserJSP/create.jsp").forward(req, resp);
+    }
+
+    @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html");
         User user = new User(req.getParameter("name"), req.getParameter("login"), req.getParameter("email"));
         instance.add(user);
-        resp.sendRedirect(String.format("%s/index.jsp", req.getContextPath()));
+        resp.sendRedirect(req.getContextPath() + "/");
     }
 
     @Override

@@ -13,11 +13,16 @@ public class UserUpdateServlet extends HttpServlet {
     private UserStore instance;
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setAttribute("user", instance.getById(Integer.parseInt(req.getParameter("id"))));
+        req.getRequestDispatcher("WEB-INF/UserJSP/edit.jsp").forward(req, resp);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html");
         instance.update(Integer.parseInt(req.getParameter("id")), req.getParameter("name"),
                 req.getParameter("login"), req.getParameter("email"));
-        resp.sendRedirect(String.format("%s/index.jsp", req.getContextPath()));
+        resp.sendRedirect(req.getContextPath() + "/");
     }
 
     @Override

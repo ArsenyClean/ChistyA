@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="crudservlet.UserStore" %>
 <%@ page import="crudservlet.DatePool" %>
 <%@ page import="crudservlet.User" %>
@@ -9,7 +10,7 @@
     <title></title>
 </head>
 <body>
-<form action="<%=request.getContextPath()%>/create.jsp">
+<form action="${pageContext.servletContext.contextPath}/create" method="get">
     <input type="submit" value="Create user! "/>
 </form>
 <table border="1">
@@ -21,34 +22,30 @@
         <th>Edit</th>
         <th>Delete</th>
     </tr>
-    <%  UserStore instance;
-        DatePool datePool = new DatePool();
-        instance = new UserStore(datePool.poolInit());
-        for (User user : instance.getUsers()) {
-    %>
+    <c:forEach items="${users}" var="user">
     <tr>
-        <td><%=user.getName()%>
+        <td><c:out value="${user.name}"></c:out>
         </td>
-        <td><%=user.getLogin()%>
+        <td><c:out value="${user.login}"></c:out>
         </td>
-        <td><%=user.getEmail()%>
+        <td><c:out value="${user.email}"></c:out>
         </td>
-        <td><%=user.getCreateDate()%>
+        <td><c:out value="${user.createDate}"></c:out>
         </td>
         <td>
-            <form action="<%=request.getContextPath()%>/edit.jsp">
-                <input type="hidden" name="id" value="<%=user.getId()%>"/>
+            <form action="${pageContext.servletContext.contextPath}/edit" method=get>
+                <input type="hidden" name="id" value="${user.id}"/>
                 <input type="submit" value="Edit "/>
             </form>
         </td>
         <td>
-            <form action="<%=request.getContextPath()%>/delete" method=post>
-                <input type="hidden" name="id" value="<%=user.getId()%>"/>
+            <form action="${pageContext.servletContext.contextPath}/delete" method=post>
+                <input type="hidden" name="id" value="${user.id}"/>
                 <input type="submit" value="Delete "/>
             </form>
         </td>
     </tr>
-    <% } %>
+    </c:forEach>
 </table>
 </body>
 </html>
