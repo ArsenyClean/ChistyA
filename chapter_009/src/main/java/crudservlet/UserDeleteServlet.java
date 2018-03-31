@@ -14,7 +14,7 @@ public class UserDeleteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/html");
         instance.delete(Integer.valueOf(req.getParameter("id")));
-        resp.sendRedirect(req.getContextPath() + "/list");
+        resp.sendRedirect(String.format("%s/index.jsp", req.getContextPath()));
     }
 
     @Override

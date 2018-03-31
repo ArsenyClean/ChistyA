@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 public class User {
-
     private Integer id;
     private String name;
     private String login;

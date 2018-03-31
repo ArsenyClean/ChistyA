@@ -19,8 +19,6 @@ public class UserStore {
 
     private Logger LOG = LoggerFactory.getLogger(UserStore.class);
     private Connection connection;
-    private PreparedStatement pr;
-    private ResultSet rs;
 
     private final String url = "jdbc:postgresql://localhost:5432/userstore";
     private final String username = "postgres";
@@ -48,6 +46,8 @@ public class UserStore {
     public User getById(Integer id) {
         User user = null;
         try {
+            PreparedStatement pr;
+            ResultSet rs;
             pr = connection.prepareStatement("SELECT id, name, login, email, date_creation from users where id=(?);");
             pr.setInt(1, id);
             rs = pr.executeQuery();
@@ -65,30 +65,29 @@ public class UserStore {
         return user;
     }
 
-    public int add(User user) {
-        int id = -1;
+    public void add(User user) {
         try {
+            PreparedStatement pr;
             pr = connection.prepareStatement("insert into users(name, login, email, date_creation) values (?,?,?,?) RETURNING id;");
-            System.out.println(user.toString());
             pr.setString(1, user.getName());
             pr.setString(2, user.getLogin());
             pr.setString(3, user.getEmail());
             pr.setString(4, user.getCreateDate());
-            try (ResultSet rs = pr.executeQuery()) {
-                while (rs.next()) {
-                    id = rs.getInt("id");
+            try (ResultSet resultSet = pr.executeQuery()) {
+                while (resultSet.next()) {
+                    int i = resultSet.getInt("id");
                 }
             }
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return id;
     }
 
     public boolean update(Integer id, String name, String login, String email) {
         boolean result = false;
         try {
+            PreparedStatement pr;
             pr = connection.prepareStatement("UPDATE users set name=(?), login=?, email=(?) where id=?;");
             pr.setString(1, name);
             pr.setString(2, login);
@@ -106,6 +105,7 @@ public class UserStore {
     public boolean delete(Integer id) {
         boolean result = false;
         try {
+            PreparedStatement pr;
             pr = connection.prepareStatement("DELETE from users WHERE id=(?);");
             pr.setInt(1, id);
             pr.execute();
@@ -120,6 +120,7 @@ public class UserStore {
     public List<User> getUsers() {
         List<User> users = new ArrayList<>();
         try {
+            PreparedStatement pr;
             pr = connection.prepareStatement("SELECT * from users;");
             try (ResultSet resultSet = pr.executeQuery()) {
                 while (resultSet.next()) {
