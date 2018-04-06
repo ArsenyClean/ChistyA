@@ -1,4 +1,4 @@
-import baltinfocom.BaltInfoComApplication;
+import BaltInfoComApplication.BaltInfoComApplication;
 import org.junit.Test;
 
 public class Test1 {

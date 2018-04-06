@@ -1,4 +1,4 @@
-package baltinfocom;
+package BaltInfoComApplication;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,24 +21,29 @@ public class FileParser {
     private Logger LOG = LoggerFactory.getLogger(FileParser.class);
 
     public List<List<Long>> fileparse() {
-
-        List<List<Long>> lists = new ArrayList<>();
+        List<List<Long>>lists = new ArrayList<>();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             String line;
-            int endFlag = 1000000;
-            int i = 0;
-            while ((line = reader.readLine()) != null && i <= endFlag) {
+            Integer endFlag = 200000000;
+            Long counter = new Long(0);
+            while ((line = reader.readLine()) != null && counter < endFlag) {
+                counter++;
+                line = line.replace("\"", "");
                 List<Long> numbers = lineParser(line);
-                lists.add(numbers);
-                i++;
+                if (numbers != null) {
+                    lists.add(numbers);
+                }
+                if (counter % 100000 == 0) {
+                    System.out.println(counter + " lines of file were cheked.. ");
+                }
             }
         } catch (FileNotFoundException e) {
             LOG.error(e.getMessage(), e);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
-//        showData(lists);
+// showData(lists);
         return lists;
     }
 
@@ -51,7 +56,8 @@ public class FileParser {
             } else {
                 if (!words[i].equals("")) {
                     try {
-                        Long longNumber = Double.valueOf(words[i]).longValue();
+                        Double doible = Double.valueOf(words[i]) * 100;
+                        Long longNumber = doible.longValue();
                         numbers.add(longNumber);
                     } catch (NumberFormatException e) {
                         LOG.info("Some NumberFormatException was catched!" + e.getMessage());
@@ -61,6 +67,15 @@ public class FileParser {
                     numbers.add(null);
                 }
             }
+        }
+        Integer i = 0;
+        for (int j = 0; j < 3; j++) {
+            if (numbers.get(j) == null) {
+                i++;
+            }
+        }
+        if (i == 3) {
+            numbers = null;
         }
         return numbers;
     }
