@@ -1,6 +1,4 @@
-<%@ page import="crudservlet.UserStore" %>
-<%@ page import="crudservlet.DatePool" %>
-<%@ page import="crudservlet.User" %>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%--
   Created by IntelliJ IDEA.
@@ -16,11 +14,11 @@
 </head>
 <body>
 <form action="${pageContext.servletContext.contextPath}/edit" method="post">
-    <c:set var="user" value="${user}"></c:set>
-    <input type='hidden' name="id" value="${user.id}">
-    <label>Name </label><input type="text" name="name" value="${user.name}"><br/>
-    <label>Login </label><input type="text" name="login" value="${user.login}"><br/>
-    <label>Email </label><input type="text" name="email" value="${user.email}"><br/>
+    <c:set var="us" value="${user}"></c:set>
+    <input type='hidden' name="id" value="${us.id}">
+    <label>Name </label><input type="text" name="name" value="${us.name}"><br/>
+    <label>Login </label><input type="text" name="login" value="${us.login}"><br/>
+    <label>Email </label><input type="text" name="email" value="${us.email}"><br/>
     <br/>
     <input type="submit" value="Edit it "/>
 
