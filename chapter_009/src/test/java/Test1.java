@@ -5,7 +5,7 @@ public class Test1 {
 
     @Test
     public void test() {
-        BaltInfoComApplication b = new BaltInfoComApplication("C://lng.csv", "D://text.txt");
+        BaltInfoComApplication b = new BaltInfoComApplication("C://lng-big.csv", "D://text.txt");
         b.start();
     }
 }

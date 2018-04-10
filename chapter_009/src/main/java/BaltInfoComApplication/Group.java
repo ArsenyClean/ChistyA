@@ -12,13 +12,18 @@ public class Group {
     Integer rowCounter = 0;
     Integer groupId;
 
-    public List<Group> getInnerGroupStore() {
-        return innerGroupStore;
+    public void addRows(Map<InnerKey, Integer> list) {
+        this.rowCounter += list.size();
+        this.setOfRows.putAll(list);
     }
 
-    public void addGroupInInnerStire(Group group) {
-        this.innerGroupStore.add(group);
+    public Map<InnerKey, Integer> gerSetOfRows() {
+        return this.setOfRows;
     }
+
+//    public void addGroupInInnerStore(Group group) {
+//        this.innerGroupStore.add(group);
+//    }
 
     public void setRowCounter(Integer rowCounter) {
         this.rowCounter = rowCounter;
@@ -42,9 +47,9 @@ public class Group {
         this.groupId = groupId;
     }
 
-    public void checkAndAddIfUnique(List<Long> list) {
+    public void add(List<String> list) {
         InnerKey innerKey = new InnerKey(list.get(0), list.get(1), list.get(2));
-            setOfRows.put(innerKey, rowCounter++);
+        setOfRows.put(innerKey, rowCounter++);
     }
 
     @Override
@@ -53,6 +58,9 @@ public class Group {
         for (Map.Entry entry : setOfRows.entrySet()) {
             sb.append("Row № ").append(entry.getValue())
                     .append(", ").append(entry.getKey().toString()).append("\n");
+        }
+        for (Group group : innerGroupStore) {
+            sb.append(group.toString());
         }
         return sb.toString();
     }

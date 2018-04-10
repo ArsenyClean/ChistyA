@@ -20,9 +20,10 @@ public class BaltInfoComApplication {
 
     public void start() {
         long time = System.currentTimeMillis();
+        long summT = System.currentTimeMillis();
         System.out.println("Start parsing file" );
         FileParser fileParser = new FileParser(firstFilePath);
-        List<List<Long>> lists = fileParser.fileparse();
+        List<List<String>> lists = fileParser.fileparse();
         System.out.println("End parsing file with time= " + (System.currentTimeMillis() - time));
         time = System.currentTimeMillis();
         Groups groups = new Groups(lists);
@@ -33,11 +34,12 @@ public class BaltInfoComApplication {
         time = System.currentTimeMillis();
         String string = groups.makeGroups();
         System.out.println("End grouping with time= " + (System.currentTimeMillis() - time));
-//        System.out.println(string);
+        System.out.println(string);
         try {
             FileWriter printWriter = new FileWriter(finalFilePath);
             printWriter.append(string);
             printWriter.flush();
+            System.out.println("End time = " + (System.currentTimeMillis() - summT));
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }

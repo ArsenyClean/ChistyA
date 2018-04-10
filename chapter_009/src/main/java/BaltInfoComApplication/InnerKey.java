@@ -1,11 +1,11 @@
 package BaltInfoComApplication;
 
 public class InnerKey {
-    Long numberOne;
-    Long numberTwo;
-    Long numberThree;
+    String numberOne;
+    String numberTwo;
+    String numberThree;
 
-    public InnerKey(Long numberOne, Long numberTwo, Long numberThree) {
+    public InnerKey(String numberOne, String numberTwo, String numberThree) {
         this.numberOne = numberOne;
         this.numberTwo = numberTwo;
         this.numberThree = numberThree;
@@ -44,7 +44,7 @@ public class InnerKey {
         StringBuilder sb = new StringBuilder();
         sb.append(numberOne).append(", ")
                 .append(numberTwo).append(", ")
-                .append(numberThree).append(", ");
+                .append(numberThree);
         return sb.toString();
     }
 }
