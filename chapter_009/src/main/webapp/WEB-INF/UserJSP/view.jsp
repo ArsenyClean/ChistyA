@@ -18,29 +18,31 @@
         <th>name</th>
         <th>login</th>
         <th>email</th>
+        <th>password</th>
+        <th>role</th>
         <th>create date</th>
         <th>Edit</th>
         <th>Delete</th>
     </tr>
-    <c:forEach items="${users}" var="user">
+    <c:forEach items="${users}" var="us">
     <tr>
-        <td><c:out value="${user.name}"></c:out>
+        <td><c:out value="${us.name}"></c:out>
         </td>
-        <td><c:out value="${user.login}"></c:out>
+        <td><c:out value="${us.login}"></c:out>
         </td>
-        <td><c:out value="${user.email}"></c:out>
+        <td><c:out value="${us.email}"></c:out>
         </td>
-        <td><c:out value="${user.createDate}"></c:out>
+        <td><c:out value="${us.createDate}"></c:out>
         </td>
         <td>
             <form action="${pageContext.servletContext.contextPath}/edit" method=get>
-                <input type="hidden" name="id" value="${user.id}"/>
+                <input type="hidden" name="id" value="${us.id}"/>
                 <input type="submit" value="Edit "/>
             </form>
         </td>
         <td>
             <form action="${pageContext.servletContext.contextPath}/delete" method=post>
-                <input type="hidden" name="id" value="${user.id}"/>
+                <input type="hidden" name="id" value="${us.id}"/>
                 <input type="submit" value="Delete "/>
             </form>
         </td>
