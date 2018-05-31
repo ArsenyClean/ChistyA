@@ -19,14 +19,11 @@ public class MusicStore {
 
     private static   Logger LOG = LoggerFactory.getLogger(MusicStore.class);
 
-    private   Properties properties = new Properties();
+    private Properties properties = new Properties();
 
     private Connection connection = null;
-    private PreparedStatement statement = null;
-    private ResultSet resultSet = null;
-    private ResultSet resultSet1 = null;
 
-    private static   MusicStore instance = new MusicStore();
+    private static MusicStore instance = new MusicStore();
 
     public static MusicStore getInstance() {
         return instance;
@@ -40,6 +37,7 @@ public class MusicStore {
         p.setPassword(this.properties.getProperty("password"));
         DataSource datasource = new DataSource();
         datasource.setPoolProperties(p);
+        PreparedStatement statement = null;
         try {
             this.connection = datasource.getConnection();
         } catch (SQLException e) {
@@ -47,7 +45,7 @@ public class MusicStore {
         }
         StringBuilder builder = new StringBuilder();
         try {
-            this.statement = this.connection.prepareStatement("CREATE TABLE IF NOT EXISTS " +
+            statement = this.connection.prepareStatement("CREATE TABLE IF NOT EXISTS " +
                     "music (id SERIAL PRIMARY KEY, name VARCHAR(30));" +
                     "CREATE TABLE IF NOT EXISTS role " +
                     "(id SERIAL PRIMARY KEY, name VARCHAR(30));" +
@@ -65,14 +63,14 @@ public class MusicStore {
         }
         try {
             for(Enum value : Arrays.asList(Role.values())) {
-                this.statement = connection.prepareStatement("INSERT INTO role (name) " +
+                statement = connection.prepareStatement("INSERT INTO role (name) " +
                         "SELECT ? WHERE NOT EXISTS (SELECT id FROM role WHERE name = ?);");
                 statement.setString(1, value.name());
                 statement.setString(2, value.name());
                 statement.executeUpdate();
             }
             for(Enum value : Arrays.asList(MusicType.values())) {
-                this.statement = connection.prepareStatement("INSERT INTO music (name) " +
+                statement = connection.prepareStatement("INSERT INTO music (name) " +
                         "SELECT ? WHERE NOT EXISTS (SELECT id FROM music WHERE name = ?);");
                 statement.setString(1, value.name());
                 statement.setString(2, value.name());
@@ -119,30 +117,32 @@ public class MusicStore {
         Address currentAddress = null;
         List<MusicType> currentUserMusicTypes = new LinkedList<>();
         Role currentUserRole = null;
+        PreparedStatement statement = null;
         try {
-            this.statement = connection.prepareStatement("SELECT * FROM users WHERE user_id = ?;");
-            this.statement.setString(1, userId);
-            this.resultSet1 = this.statement.executeQuery();
-            while (this.resultSet1.next()) {
-                userName = this.resultSet1.getString("name");
-                userLogin = this.resultSet1.getString("login");
-                userPassword = this.resultSet1.getString("password");
-                create_date = this.resultSet1.getTimestamp("create_date");
-                currentUserAddressId = this.resultSet1.getInt("address_id");
-                currentUserRoleId = this.resultSet1.getInt("role_id");
+            statement = connection.prepareStatement("SELECT * FROM users WHERE user_id = ?;");
+            statement.setString(1, userId);
+            ResultSet resultSet1 = null;
+            resultSet1 = statement.executeQuery();
+            while (resultSet1.next()) {
+                userName = resultSet1.getString("name");
+                userLogin = resultSet1.getString("login");
+                userPassword = resultSet1.getString("password");
+                create_date = resultSet1.getTimestamp("create_date");
+                currentUserAddressId = resultSet1.getInt("address_id");
+                currentUserRoleId = resultSet1.getInt("role_id");
                 currentAddress = this.getAddressById(currentUserAddressId);
                 currentUserRole = this.getRoleById(currentUserRoleId);
 
-                this.statement = connection.prepareStatement("SELECT music_type.name FROM user_music " +
+                statement = connection.prepareStatement("SELECT music_type.name FROM user_music " +
                                                     "INNER JOIN users " +
                                                     "ON users.id = user_music.user_id " +
                                                     "INNER JOIN music " +
                                                     "ON music.id = user_music.music_type_id " +
                                                     "WHERE users.user_id = ?;");
-                this.statement.setString(1, userId);
-                this.resultSet1 = this.statement.executeQuery();
-                while (this.resultSet1.next()) {
-                    currentUserMusicTypes.add(MusicType.valueOf(this.resultSet1.getString("name")));
+                statement.setString(1, userId);
+                resultSet1 = statement.executeQuery();
+                while (resultSet1.next()) {
+                    currentUserMusicTypes.add(MusicType.valueOf(resultSet1.getString("name")));
                 }
                 foundUser = new User(userId, userName, userLogin, userPassword,
                         currentAddress, currentUserRole, currentUserMusicTypes, create_date);
@@ -155,17 +155,18 @@ public class MusicStore {
 
     public void deleteUser(  String userId) {
         try {
-            this.statement = connection.prepareStatement("DELETE FROM user_music WHERE user_id = " +
+            PreparedStatement statement = null;
+            statement = connection.prepareStatement("DELETE FROM user_music WHERE user_id = " +
                     "(SELECT id FROM users WHERE user_id = ?);");
-            this.statement.setString(1, userId);
-            this.statement.executeUpdate();
-            this.statement = connection.prepareStatement("DELETE FROM users WHERE user_id = ?;");
-            this.statement.setString(1, userId);
-            this.statement.executeUpdate();
-            this.statement = connection.prepareStatement("DELETE FROM address WHERE user_id = " +
+            statement.setString(1, userId);
+            statement.executeUpdate();
+            statement = connection.prepareStatement("DELETE FROM users WHERE user_id = ?;");
+            statement.setString(1, userId);
+            statement.executeUpdate();
+            statement = connection.prepareStatement("DELETE FROM address WHERE user_id = " +
                     "(SELECT id FROM users WHERE user_id = ?);");
-            this.statement.setString(1, userId);
-            this.statement.executeUpdate();
+            statement.setString(1, userId);
+            statement.executeUpdate();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -174,12 +175,14 @@ public class MusicStore {
     public User getUserIdByLoginAndPassword(  String userLogin,   String userPassword) {
         User foundUser = null;
             try {
-                this.statement = connection.prepareStatement("SELECT user_id FROM users WHERE login = ? AND password = ?;");
-                this.statement.setString(1, userLogin);
-                this.statement.setString(2, userPassword);
-                this.resultSet = statement.executeQuery();
-                while (this.resultSet.next()) {
-                    foundUser = this.getuserbyid(this.resultSet.getString("user_id"));
+                PreparedStatement statement = null;
+                statement = connection.prepareStatement("SELECT user_id FROM users WHERE login = ? AND password = ?;");
+                statement.setString(1, userLogin);
+                statement.setString(2, userPassword);
+                ResultSet resultSet = null;
+                resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    foundUser = this.getuserbyid(resultSet.getString("user_id"));
                 }
             } catch (SQLException e) {
                 LOG.error(e.getMessage(), e);
@@ -197,13 +200,14 @@ public class MusicStore {
 
     private void createAdress(  Address address) {
             try {
-                this.statement = connection.prepareStatement("INSERT INTO address(country, city, street, house, flat)" +
+                PreparedStatement statement = null;
+                statement = connection.prepareStatement("INSERT INTO address(country, city, street, house, flat)" +
                         "VALUES (?, ?, ?, ?, ?);");
-                this.statement.setString(1, address.getCountry());
-                this.statement.setString(2, address.getCity());
-                this.statement.setString(3, address.getStreet());
-                this.statement.setString(4, address.getHouse());
-                this.statement.setString(5, address.getFlat());
+                statement.setString(1, address.getCountry());
+                statement.setString(2, address.getCity());
+                statement.setString(3, address.getStreet());
+                statement.setString(4, address.getHouse());
+                statement.setString(5, address.getFlat());
                 statement.executeUpdate();
             } catch (SQLException e) {
                 LOG.error(e.getMessage(), e);
@@ -213,16 +217,18 @@ public class MusicStore {
     private int getAddressId(  Address address) {
         int addressId = 0;
         try {
-            this.statement = connection.prepareStatement("SELECT id FROM address WHERE country = ? " +
+            PreparedStatement statement = null;
+            statement = connection.prepareStatement("SELECT id FROM address WHERE country = ? " +
                     "AND city = ? AND street = ? AND house = ? AND flat = ?;");
-            this.statement.setString(1, address.getCountry());
-            this.statement.setString(2, address.getCity());
-            this.statement.setString(3, address.getStreet());
-            this.statement.setString(4, address.getHouse());
-            this.statement.setString(5, address.getFlat());
-            this.resultSet = statement.executeQuery();
-            while (this.resultSet.next()) {
-                addressId = this.resultSet.getInt("id");
+            statement.setString(1, address.getCountry());
+            statement.setString(2, address.getCity());
+            statement.setString(3, address.getStreet());
+            statement.setString(4, address.getHouse());
+            statement.setString(5, address.getFlat());
+            ResultSet resultSet = null;
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                addressId = resultSet.getInt("id");
             }
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
@@ -233,15 +239,17 @@ public class MusicStore {
     private Address getAddressById(  int addressId) {
         Address foundAddress = null;
         try {
-            this.statement = connection.prepareStatement("SELECT * FROM address WHERE id = ?;");
-            this.statement.setInt(1, addressId);
-            this.resultSet = this.statement.executeQuery();
-            while (this.resultSet.next()) {
-                foundAddress = new Address(this.resultSet.getString("country"),
-                        this.resultSet.getString("city"),
-                        this.resultSet.getString("street"),
-                        this.resultSet.getString("house"),
-                        this.resultSet.getString("flat"));
+            PreparedStatement statement = null;
+            statement = connection.prepareStatement("SELECT * FROM address WHERE id = ?;");
+            statement.setInt(1, addressId);
+            ResultSet resultSet = null;
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                foundAddress = new Address(resultSet.getString("country"),
+                        resultSet.getString("city"),
+                        resultSet.getString("street"),
+                        resultSet.getString("house"),
+                        resultSet.getString("flat"));
             }
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
@@ -252,11 +260,13 @@ public class MusicStore {
     private int getRoleId(  Role role) {
         int roleId = 0;
         try {
-            this.statement = connection.prepareStatement("SELECT id FROM role WHERE name = ?;");
-            this.statement.setString(1, role.name());
-            this.resultSet = statement.executeQuery();
-            while (this.resultSet.next()) {
-                roleId = this.resultSet.getInt("id");
+            PreparedStatement statement = null;
+            statement = connection.prepareStatement("SELECT id FROM role WHERE name = ?;");
+            statement.setString(1, role.name());
+            ResultSet resultSet = null;
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                roleId = resultSet.getInt("id");
             }
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
@@ -267,11 +277,13 @@ public class MusicStore {
     private Role getRoleById(  int roleId) {
         Role foundRole = null;
         try {
-            this.statement = connection.prepareStatement("SELECT name FROM role WHERE id = ?;");
-            this.statement.setInt(1, roleId);
-            this.resultSet = this.statement.executeQuery();
-            while (this.resultSet.next()) {
-                foundRole = Role.valueOf(this.resultSet.getString("name"));
+            PreparedStatement statement = null;
+            statement = connection.prepareStatement("SELECT name FROM role WHERE id = ?;");
+            statement.setInt(1, roleId);
+            ResultSet resultSet = null;
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                foundRole = Role.valueOf(resultSet.getString("name"));
             }
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
@@ -283,22 +295,24 @@ public class MusicStore {
                                 String password,   int addressId,   int roleId) {
         String userId = null;
         try {
-            this.statement = connection.prepareStatement("INSERT INTO users(user_id, name, " +
+            PreparedStatement statement = null;
+            statement = connection.prepareStatement("INSERT INTO users(user_id, name, " +
                     " login, password, address_id, role_id, create_date)" +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
-            this.statement.setString(1, String.valueOf(System.currentTimeMillis()));
-            this.statement.setString(2, name);
-            this.statement.setString(3, login);
-            this.statement.setString(4, password);
-            this.statement.setInt(5, addressId);
-            this.statement.setInt(6, roleId);
-            this.statement.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+            statement.setString(1, String.valueOf(System.currentTimeMillis()));
+            statement.setString(2, name);
+            statement.setString(3, login);
+            statement.setString(4, password);
+            statement.setInt(5, addressId);
+            statement.setInt(6, roleId);
+            statement.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
             statement.executeUpdate();
-            this.statement = connection.prepareStatement("SELECT user_id FROM users WHERE address_id = ?;");
-            this.statement.setInt(1, addressId);
-            this.resultSet = this.statement.executeQuery();
-            while (this.resultSet.next()) {
-                userId = this.resultSet.getString("user_id");
+            statement = connection.prepareStatement("SELECT user_id FROM users WHERE address_id = ?;");
+            statement.setInt(1, addressId);
+            ResultSet resultSet = null;
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                userId = resultSet.getString("user_id");
             }
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
@@ -308,11 +322,13 @@ public class MusicStore {
 
     private int getMusicTypeId(  MusicType musicType) throws SQLException {
         int result = 0;
-        this.statement = connection.prepareStatement("SELECT id FROM music_type WHERE name = ?;");
-        this.statement.setString(1, musicType.name());
-        this.resultSet = statement.executeQuery();
-        while (this.resultSet.next()) {
-            result = this.resultSet.getInt("id");
+        PreparedStatement statement = null;
+        statement = connection.prepareStatement("SELECT id FROM music_type WHERE name = ?;");
+        statement.setString(1, musicType.name());
+        ResultSet resultSet = null;
+        resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            result = resultSet.getInt("id");
         }
         return result;
     }
@@ -321,18 +337,20 @@ public class MusicStore {
         int userSqlId = 0;
         int userMusicTypeId = 0;
         try {
-            this.statement = connection.prepareStatement("SELECT id FROM users WHERE user_id = ?;");
-            this.statement.setString(1, userId);
-            this.resultSet = this.statement.executeQuery();
-            while (this.resultSet.next()) {
-                userSqlId = this.resultSet.getInt("id");
+            PreparedStatement statement = null;
+            statement = connection.prepareStatement("SELECT id FROM users WHERE user_id = ?;");
+            statement.setString(1, userId);
+            ResultSet resultSet = null;
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                userSqlId = resultSet.getInt("id");
             }
             for (MusicType musicType: userMusicTypesList) {
                 userMusicTypeId = this.getMusicTypeId(musicType);
-                this.statement = connection.prepareStatement("INSERT INTO user_music(user_id, music_type_id)" +
+                statement = connection.prepareStatement("INSERT INTO user_music(user_id, music_type_id)" +
                         "VALUES (?, ?);");
-                this.statement.setInt(1, userSqlId);
-                this.statement.setInt(2, userMusicTypeId);
+                statement.setInt(1, userSqlId);
+                statement.setInt(2, userMusicTypeId);
                 statement.executeUpdate();
             }
         } catch (SQLException e) {
