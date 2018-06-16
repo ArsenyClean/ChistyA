@@ -21,7 +21,7 @@ public class MusicStore {
 
     private Properties properties = new Properties();
 
-    private Connection connection = null;
+    ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     private static MusicStore instance = new MusicStore();
 
@@ -35,17 +35,18 @@ public class MusicStore {
         p.setDriverClassName("org.postgresql.Driver");
         p.setUsername(this.properties.getProperty("user"));
         p.setPassword(this.properties.getProperty("password"));
+        Connection connection = connectionPool.getConnection();
         DataSource datasource = new DataSource();
         datasource.setPoolProperties(p);
         PreparedStatement statement = null;
         try {
-            this.connection = datasource.getConnection();
+            connection = datasource.getConnection();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
         StringBuilder builder = new StringBuilder();
         try {
-            statement = this.connection.prepareStatement("CREATE TABLE IF NOT EXISTS " +
+            statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " +
                     "music (id SERIAL PRIMARY KEY, name VARCHAR(30));" +
                     "CREATE TABLE IF NOT EXISTS role " +
                     "(id SERIAL PRIMARY KEY, name VARCHAR(30));" +
@@ -94,7 +95,8 @@ public class MusicStore {
     public List<User> getAllUsers() {
         List<User> allUsers = new LinkedList<>();
         String sql = "SELECT * FROM users;";
-        try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
+        Connection connection = connectionPool.getConnection();
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             try (ResultSet rSet = ps.executeQuery()) {
                 while(rSet.next()) {
                     allUsers.add(this.getuserbyid(rSet.getString("user_id")));
@@ -119,6 +121,7 @@ public class MusicStore {
         Role currentUserRole = null;
         PreparedStatement statement = null;
         try {
+            Connection connection = connectionPool.getConnection();
             statement = connection.prepareStatement("SELECT * FROM users WHERE user_id = ?;");
             statement.setString(1, userId);
             ResultSet resultSet1 = null;
@@ -156,6 +159,7 @@ public class MusicStore {
     public void deleteUser(  String userId) {
         try {
             PreparedStatement statement = null;
+            Connection connection = connectionPool.getConnection();
             statement = connection.prepareStatement("DELETE FROM user_music WHERE user_id = " +
                     "(SELECT id FROM users WHERE user_id = ?);");
             statement.setString(1, userId);
@@ -176,6 +180,7 @@ public class MusicStore {
         User foundUser = null;
             try {
                 PreparedStatement statement = null;
+                Connection connection = connectionPool.getConnection();
                 statement = connection.prepareStatement("SELECT user_id FROM users WHERE login = ? AND password = ?;");
                 statement.setString(1, userLogin);
                 statement.setString(2, userPassword);
@@ -201,6 +206,7 @@ public class MusicStore {
     private void createAdress(  Address address) {
             try {
                 PreparedStatement statement = null;
+                Connection connection = connectionPool.getConnection();
                 statement = connection.prepareStatement("INSERT INTO address(country, city, street, house, flat)" +
                         "VALUES (?, ?, ?, ?, ?);");
                 statement.setString(1, address.getCountry());
@@ -218,6 +224,7 @@ public class MusicStore {
         int addressId = 0;
         try {
             PreparedStatement statement = null;
+            Connection connection = connectionPool.getConnection();
             statement = connection.prepareStatement("SELECT id FROM address WHERE country = ? " +
                     "AND city = ? AND street = ? AND house = ? AND flat = ?;");
             statement.setString(1, address.getCountry());
@@ -240,6 +247,7 @@ public class MusicStore {
         Address foundAddress = null;
         try {
             PreparedStatement statement = null;
+            Connection connection = connectionPool.getConnection();
             statement = connection.prepareStatement("SELECT * FROM address WHERE id = ?;");
             statement.setInt(1, addressId);
             ResultSet resultSet = null;
@@ -261,6 +269,7 @@ public class MusicStore {
         int roleId = 0;
         try {
             PreparedStatement statement = null;
+            Connection connection = connectionPool.getConnection();
             statement = connection.prepareStatement("SELECT id FROM role WHERE name = ?;");
             statement.setString(1, role.name());
             ResultSet resultSet = null;
@@ -277,6 +286,7 @@ public class MusicStore {
     private Role getRoleById(  int roleId) {
         Role foundRole = null;
         try {
+            Connection connection = connectionPool.getConnection();
             PreparedStatement statement = null;
             statement = connection.prepareStatement("SELECT name FROM role WHERE id = ?;");
             statement.setInt(1, roleId);
@@ -296,6 +306,7 @@ public class MusicStore {
         String userId = null;
         try {
             PreparedStatement statement = null;
+            Connection connection = connectionPool.getConnection();
             statement = connection.prepareStatement("INSERT INTO users(user_id, name, " +
                     " login, password, address_id, role_id, create_date)" +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
@@ -323,6 +334,7 @@ public class MusicStore {
     private int getMusicTypeId(  MusicType musicType) throws SQLException {
         int result = 0;
         PreparedStatement statement = null;
+        Connection connection = connectionPool.getConnection();
         statement = connection.prepareStatement("SELECT id FROM music_type WHERE name = ?;");
         statement.setString(1, musicType.name());
         ResultSet resultSet = null;
@@ -338,6 +350,7 @@ public class MusicStore {
         int userMusicTypeId = 0;
         try {
             PreparedStatement statement = null;
+            Connection connection = connectionPool.getConnection();
             statement = connection.prepareStatement("SELECT id FROM users WHERE user_id = ?;");
             statement.setString(1, userId);
             ResultSet resultSet = null;
