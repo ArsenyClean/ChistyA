@@ -9,6 +9,8 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -77,6 +79,8 @@ public class MusicStore {
                 statement.setString(2, value.name());
                 statement.executeUpdate();
             }
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -102,6 +106,7 @@ public class MusicStore {
                     allUsers.add(this.getuserbyid(rSet.getString("user_id")));
                 }
             }
+            connection.close();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -109,33 +114,14 @@ public class MusicStore {
     }
 
     public User getuserbyid(String userId) {
-        String userName = null;
-        String userLogin = null;
-        String userPassword = null;
-        Timestamp create_date = null;
-        int currentUserAddressId = 0;
-        int currentUserRoleId = 0;
         User foundUser = null;
-        Address currentAddress = null;
         List<MusicType> currentUserMusicTypes = new LinkedList<>();
-        Role currentUserRole = null;
-        PreparedStatement statement = null;
         try {
             Connection connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("SELECT * FROM users WHERE user_id = ?;");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE user_id = ?;");
             statement.setString(1, userId);
-            ResultSet resultSet1 = null;
-            resultSet1 = statement.executeQuery();
+            ResultSet resultSet1 = statement.executeQuery();
             while (resultSet1.next()) {
-                userName = resultSet1.getString("name");
-                userLogin = resultSet1.getString("login");
-                userPassword = resultSet1.getString("password");
-                create_date = resultSet1.getTimestamp("create_date");
-                currentUserAddressId = resultSet1.getInt("address_id");
-                currentUserRoleId = resultSet1.getInt("role_id");
-                currentAddress = this.getAddressById(currentUserAddressId);
-                currentUserRole = this.getRoleById(currentUserRoleId);
-
                 statement = connection.prepareStatement("SELECT music_type.name FROM user_music " +
                                                     "INNER JOIN users " +
                                                     "ON users.id = user_music.user_id " +
@@ -147,9 +133,14 @@ public class MusicStore {
                 while (resultSet1.next()) {
                     currentUserMusicTypes.add(MusicType.valueOf(resultSet1.getString("name")));
                 }
-                foundUser = new User(userId, userName, userLogin, userPassword,
-                        currentAddress, currentUserRole, currentUserMusicTypes, create_date);
+                foundUser = new User(userId, resultSet1.getString("name"),
+                        resultSet1.getString("login"), resultSet1.getString("password"),
+                        this.getAddressById(resultSet1.getInt("address_id")),
+                        this.getRoleById(resultSet1.getInt("role_id")), currentUserMusicTypes,
+                        resultSet1.getTimestamp("create_date"));
             }
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -158,9 +149,8 @@ public class MusicStore {
 
     public void deleteUser(  String userId) {
         try {
-            PreparedStatement statement = null;
             Connection connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("DELETE FROM user_music WHERE user_id = " +
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM user_music WHERE user_id = " +
                     "(SELECT id FROM users WHERE user_id = ?);");
             statement.setString(1, userId);
             statement.executeUpdate();
@@ -171,6 +161,8 @@ public class MusicStore {
                     "(SELECT id FROM users WHERE user_id = ?);");
             statement.setString(1, userId);
             statement.executeUpdate();
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -179,16 +171,16 @@ public class MusicStore {
     public User getUserIdByLoginAndPassword(  String userLogin,   String userPassword) {
         User foundUser = null;
             try {
-                PreparedStatement statement = null;
                 Connection connection = connectionPool.getConnection();
-                statement = connection.prepareStatement("SELECT user_id FROM users WHERE login = ? AND password = ?;");
+                PreparedStatement statement = connection.prepareStatement("SELECT user_id FROM users WHERE login = ? AND password = ?;");
                 statement.setString(1, userLogin);
                 statement.setString(2, userPassword);
-                ResultSet resultSet = null;
-                resultSet = statement.executeQuery();
+                ResultSet resultSet = statement.executeQuery();
                 while (resultSet.next()) {
                     foundUser = this.getuserbyid(resultSet.getString("user_id"));
                 }
+                statement.close();
+                connection.close();
             } catch (SQLException e) {
                 LOG.error(e.getMessage(), e);
             }
@@ -215,6 +207,8 @@ public class MusicStore {
                 statement.setString(4, address.getHouse());
                 statement.setString(5, address.getFlat());
                 statement.executeUpdate();
+                statement.close();
+                connection.close();
             } catch (SQLException e) {
                 LOG.error(e.getMessage(), e);
             }
@@ -237,6 +231,8 @@ public class MusicStore {
             while (resultSet.next()) {
                 addressId = resultSet.getInt("id");
             }
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -246,12 +242,10 @@ public class MusicStore {
     private Address getAddressById(  int addressId) {
         Address foundAddress = null;
         try {
-            PreparedStatement statement = null;
             Connection connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("SELECT * FROM address WHERE id = ?;");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM address WHERE id = ?;");
             statement.setInt(1, addressId);
-            ResultSet resultSet = null;
-            resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 foundAddress = new Address(resultSet.getString("country"),
                         resultSet.getString("city"),
@@ -259,6 +253,9 @@ public class MusicStore {
                         resultSet.getString("house"),
                         resultSet.getString("flat"));
             }
+
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -268,9 +265,8 @@ public class MusicStore {
     private int getRoleId(  Role role) {
         int roleId = 0;
         try {
-            PreparedStatement statement = null;
             Connection connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("SELECT id FROM role WHERE name = ?;");
+            PreparedStatement statement = connection.prepareStatement("SELECT id FROM role WHERE name = ?;");
             statement.setString(1, role.name());
             ResultSet resultSet = null;
             resultSet = statement.executeQuery();
@@ -295,6 +291,8 @@ public class MusicStore {
             while (resultSet.next()) {
                 foundRole = Role.valueOf(resultSet.getString("name"));
             }
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -325,6 +323,8 @@ public class MusicStore {
             while (resultSet.next()) {
                 userId = resultSet.getString("user_id");
             }
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -342,6 +342,8 @@ public class MusicStore {
         while (resultSet.next()) {
             result = resultSet.getInt("id");
         }
+        statement.close();
+        connection.close();
         return result;
     }
 

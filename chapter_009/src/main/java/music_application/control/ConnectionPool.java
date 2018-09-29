@@ -5,6 +5,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionPool {
@@ -21,14 +22,12 @@ public class ConnectionPool {
 	}
 
 	public Connection getConnection(){
-		Context ctx;
 		Connection c = null;
 		try {
-			ctx = new InitialContext();
-			DataSource ds = (DataSource)ctx.lookup("java:jdbc/PoolName");
-			c = ds.getConnection();
-		} catch (NamingException e) {
-			e.printStackTrace();
+			String url = "jdbc:postgresql://localhost:5432/userstore";
+			String user = "postgres";
+			String password = "1234";
+			c = DriverManager.getConnection(url, user, password);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
