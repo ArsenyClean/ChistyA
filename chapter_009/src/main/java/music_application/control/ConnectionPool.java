@@ -33,6 +33,4 @@ public class ConnectionPool {
 		}
 		return c;
 	}
-
-
 }
